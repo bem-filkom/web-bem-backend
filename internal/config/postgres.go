@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/bem-filkom/web-bem-backend/internal/pkg/entity"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/env"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/log"
 	"gorm.io/driver/postgres"
@@ -10,7 +11,15 @@ import (
 )
 
 func getDBSchemas() []any {
-	return []any{}
+	return []any{
+		&entity.User{},
+		&entity.Kemenbiro{},
+		&entity.ProgramKerja{},
+		&entity.BemMember{},
+		&entity.Student{},
+		&entity.KabarProker{},
+		&entity.KabarProkerImage{},
+	}
 }
 
 func newPostgresConnection() *gorm.DB {
