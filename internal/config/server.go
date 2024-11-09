@@ -6,23 +6,23 @@ import (
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/log"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"gorm.io/gorm"
+	"github.com/jmoiron/sqlx"
 )
 
 type Server struct {
 	engine   *fiber.App
-	db       *gorm.DB
-	handlers []handler
+	db       *sqlx.DB
+	handlers []ihandler
 }
 
-type handler interface {
+type ihandler interface {
 	Start(router fiber.Router)
 }
 
 func NewServer(engine *fiber.App) *Server {
 	return &Server{
 		engine: engine,
-		db:     newPostgresConnection(),
+		db:     postgresql.NewConnection(),
 	}
 }
 
