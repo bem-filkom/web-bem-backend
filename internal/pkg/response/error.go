@@ -12,10 +12,11 @@ func (e *ErrorResponse) Error() string {
 	return e.Message
 }
 
-func NewError(httpStatusCode int, message string) *ErrorResponse {
+func NewError(httpStatusCode int, refCode, message string) *ErrorResponse {
 	return &ErrorResponse{
 		HttpStatusCode: httpStatusCode,
 		Message:        message,
+		RefCode:        refCode,
 	}
 }
 

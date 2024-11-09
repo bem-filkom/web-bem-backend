@@ -2,8 +2,14 @@ package config
 
 import (
 	"fmt"
+	"github.com/bem-filkom/web-bem-backend/database/postgresql"
+	authHnd "github.com/bem-filkom/web-bem-backend/internal/api/auth/handler"
+	"github.com/bem-filkom/web-bem-backend/internal/api/auth/service"
+	userRepo "github.com/bem-filkom/web-bem-backend/internal/api/user/repository"
+	userSvc "github.com/bem-filkom/web-bem-backend/internal/api/user/service"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/env"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/log"
+	"github.com/bem-filkom/web-bem-backend/internal/pkg/ubauth"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/jmoiron/sqlx"
@@ -27,7 +33,15 @@ func NewServer(engine *fiber.App) *Server {
 }
 
 func (s *Server) RegisterHandlers() {
+	userRepository := userRepo.NewUserRepository(s.db)
+	userService := userSvc.NewUserService(userRepository)
+
+	ubAuth := ubauth.NewUBAuth()
+	authService := service.NewAuthService(userService, ubAuth)
+	authHandler := authHnd.NewAuthHandler(authService)
+
 	s.healthCheck()
+	s.handlers = append(s.handlers, authHandler)
 }
 
 func (s *Server) Run() {

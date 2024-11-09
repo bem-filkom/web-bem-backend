@@ -67,7 +67,7 @@ func createValidator() {
 	}
 }
 
-func Validator() *ValidatorStruct {
+func GetValidator() *ValidatorStruct {
 	once.Do(createValidator)
 
 	return validatorObj
