@@ -10,7 +10,7 @@ func (h *AuthHandler) Login() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req auth.LoginRequest
 		if err := c.BodyParser(&req); err != nil {
-			return response.ErrUnprocessableEntity.WithDetail("invalid request body")
+			return response.ErrUnprocessableEntity
 		}
 
 		token, err := h.s.LoginAuthUb(c.Context(), &req)
