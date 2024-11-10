@@ -41,3 +41,24 @@ func (s *kemenbiroService) CreateKemenbiro(ctx context.Context, req *kemenbiro.C
 
 	return id, nil
 }
+
+func (s *kemenbiroService) GetKemenbiroByAbbreviation(ctx context.Context, req *kemenbiro.GetKemenbiroByAbbreviationRequest) (*entity.Kemenbiro, error) {
+	if err := validator.GetValidator().ValidateStruct(req); err != nil {
+		return nil, response.ErrValidation.WithDetail(err)
+	}
+
+	kemenbiroObj, err := s.r.GetKemenbiroByAbbreviation(ctx, req.Abbreviation)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, response.ErrorNotFound
+		}
+
+		log.GetLogger().WithFields(map[string]any{
+			"error": err,
+			"id":    req.Abbreviation,
+		}).Errorln("[KemenbiroService][GetKemenbiroByAbbreviation] fail to get kemenbiro by abbreviation")
+		return nil, response.ErrInternalServerError
+	}
+
+	return kemenbiroObj, nil
+}

@@ -23,3 +23,21 @@ func (h *KemenbiroHandler) CreateKemenbiro() fiber.Handler {
 		})
 	}
 }
+
+func (h *KemenbiroHandler) GetKemenbiroByAbbreviation() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var req kemenbiro.GetKemenbiroByAbbreviationRequest
+		if err := c.ParamsParser(&req); err != nil {
+			return response.ErrUnprocessableEntity
+		}
+
+		kemenbiroObj, err := h.s.GetKemenbiroByAbbreviation(c.Context(), &req)
+		if err != nil {
+			return err
+		}
+
+		return c.JSON(map[string]any{
+			"kemenbiro": kemenbiroObj,
+		})
+	}
+}

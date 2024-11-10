@@ -12,6 +12,7 @@ type kemenbiroRepository struct {
 
 type IKemenbiroRepository interface {
 	CreateKemenbiro(ctx context.Context, kemenbiro *entity.Kemenbiro) (*entity.Kemenbiro, error)
+	GetKemenbiroByAbbreviation(ctx context.Context, abbreviation string) (*entity.Kemenbiro, error)
 }
 
 func NewKemenbiroRepository(db *sqlx.DB) IKemenbiroRepository {
