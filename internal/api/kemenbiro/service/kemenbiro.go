@@ -13,7 +13,7 @@ import (
 )
 
 func (s *kemenbiroService) CreateKemenbiro(ctx context.Context, req *kemenbiro.CreateKemenbiroRequest) (*entity.Kemenbiro, error) {
-	if err := validator.GetValidator().Validate(req); err != nil {
+	if err := validator.GetValidator().ValidateStruct(req); err != nil {
 		return nil, response.ErrValidation.WithDetail(err)
 	}
 

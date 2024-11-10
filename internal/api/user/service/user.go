@@ -11,7 +11,7 @@ import (
 )
 
 func (s *userService) SaveUser(ctx context.Context, req *user.SaveUserRequest) error {
-	if valErr := validator.GetValidator().Validate(req); valErr != nil {
+	if valErr := validator.GetValidator().ValidateStruct(req); valErr != nil {
 		log.GetLogger().WithFields(map[string]interface{}{
 			"error":   valErr.Error(),
 			"request": req,
@@ -34,7 +34,7 @@ func (s *userService) SaveUser(ctx context.Context, req *user.SaveUserRequest) e
 }
 
 func (s *userService) SaveStudent(ctx context.Context, req *user.SaveStudentRequest) error {
-	if valErr := validator.GetValidator().Validate(req); valErr != nil {
+	if valErr := validator.GetValidator().ValidateStruct(req); valErr != nil {
 		log.GetLogger().WithFields(map[string]interface{}{
 			"error":   valErr.Error(),
 			"request": req,

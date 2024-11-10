@@ -13,7 +13,7 @@ import (
 )
 
 func (s *authService) LoginAuthUb(ctx context.Context, req *auth.LoginRequest) (string, error) {
-	if err := validator.GetValidator().Validate(req); err != nil {
+	if err := validator.GetValidator().ValidateStruct(req); err != nil {
 		return "", response.ErrValidation.WithDetail(err)
 	}
 

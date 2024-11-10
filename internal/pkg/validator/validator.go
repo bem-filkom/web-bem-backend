@@ -85,39 +85,49 @@ func getJSONFieldName(field reflect.StructField) string {
 	return field.Name
 }
 
-func (v *ValidatorStruct) Validate(data interface{}) ValidationErrorsResponse {
-	err := v.validator.Struct(data)
-	if err != nil {
-		var valErrs validator.ValidationErrors
-		if errors.As(err, &valErrs) {
-			// Get the type of the data struct
-			dataType := reflect.TypeOf(data)
-			if dataType.Kind() == reflect.Ptr {
-				dataType = dataType.Elem()
-			}
+func (v *ValidatorStruct) ValidateStruct(data interface{}) ValidationErrorsResponse {
+	if err := v.validator.Struct(data); err != nil {
+		return v.handleValidationErrors(err, data)
+	}
+	return nil
+}
 
-			length := len(valErrs)
-			res := make(ValidationErrorsResponse, length)
-			for i, err := range valErrs {
-				field, _ := dataType.FieldByName(err.StructField())
-				jsonTag := getJSONFieldName(field)
+func (v *ValidatorStruct) ValidateVariable(data interface{}, tag string) ValidationErrorsResponse {
+	if err := v.validator.Var(data, tag); err != nil {
+		return v.handleValidationErrors(err, nil)
+	}
+	return nil
+}
 
-				res[i] = map[string]validationError{
-					jsonTag: {
-						Tag:         err.Tag(),
-						Param:       err.Param(),
-						Translation: err.Translate(v.translator),
-					},
+func (v *ValidatorStruct) handleValidationErrors(err error, data interface{}) ValidationErrorsResponse {
+	var valErrs validator.ValidationErrors
+	if errors.As(err, &valErrs) {
+		length := len(valErrs)
+		res := make(ValidationErrorsResponse, length)
+		for i, err := range valErrs {
+			jsonTag := ""
+			if data != nil {
+				dataType := reflect.TypeOf(data)
+				if dataType.Kind() == reflect.Ptr {
+					dataType = dataType.Elem()
 				}
+				field, _ := dataType.FieldByName(err.StructField())
+				jsonTag = getJSONFieldName(field)
 			}
 
-			return res
-		} else {
-			log.GetLogger().WithFields(map[string]any{
-				"error": err.Error(),
-			}).Error("[VALIDATOR][Validate] Fail to validate data")
+			res[i] = map[string]validationError{
+				jsonTag: {
+					Tag:         err.Tag(),
+					Param:       err.Param(),
+					Translation: err.Translate(v.translator),
+				},
+			}
 		}
+		return res
 	}
 
+	log.GetLogger().WithFields(map[string]any{
+		"error": err.Error(),
+	}).Error("[VALIDATOR] Validation failed")
 	return nil
 }
