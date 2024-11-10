@@ -5,6 +5,9 @@ import (
 	"github.com/bem-filkom/web-bem-backend/database/postgresql"
 	authHnd "github.com/bem-filkom/web-bem-backend/internal/api/auth/handler"
 	"github.com/bem-filkom/web-bem-backend/internal/api/auth/service"
+	kemenbiroHnd "github.com/bem-filkom/web-bem-backend/internal/api/kemenbiro/handler"
+	kemenbiroRepo "github.com/bem-filkom/web-bem-backend/internal/api/kemenbiro/repository"
+	kemenbiroSvc "github.com/bem-filkom/web-bem-backend/internal/api/kemenbiro/service"
 	userRepo "github.com/bem-filkom/web-bem-backend/internal/api/user/repository"
 	userSvc "github.com/bem-filkom/web-bem-backend/internal/api/user/service"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/env"
@@ -40,8 +43,12 @@ func (s *Server) RegisterHandlers() {
 	authService := service.NewAuthService(userService, ubAuth)
 	authHandler := authHnd.NewAuthHandler(authService)
 
+	kemenbiroRepository := kemenbiroRepo.NewKemenbiroRepository(s.db)
+	kemenbiroService := kemenbiroSvc.NewKemenbiroService(kemenbiroRepository)
+	kemenbiroHandler := kemenbiroHnd.NewKemenbiroHandler(kemenbiroService)
+
 	s.healthCheck()
-	s.handlers = append(s.handlers, authHandler)
+	s.handlers = append(s.handlers, authHandler, kemenbiroHandler)
 }
 
 func (s *Server) Run() {
