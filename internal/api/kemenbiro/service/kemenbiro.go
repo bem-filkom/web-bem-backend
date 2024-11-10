@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"github.com/bem-filkom/web-bem-backend/internal/api/kemenbiro"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/entity"
@@ -16,10 +17,15 @@ func (s *kemenbiroService) CreateKemenbiro(ctx context.Context, req *kemenbiro.C
 		return nil, response.ErrValidation.WithDetail(err)
 	}
 
-	id, err := s.r.CreateKemenbiro(ctx, &entity.Kemenbiro{
+	kemenbiroObj := &entity.Kemenbiro{
 		Name:         req.Name,
 		Abbreviation: req.Abbreviation,
-	})
+	}
+	if req.Description == "" {
+		kemenbiroObj.Description = sql.NullString{}
+	}
+
+	id, err := s.r.CreateKemenbiro(ctx, kemenbiroObj)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
