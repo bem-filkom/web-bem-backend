@@ -15,6 +15,7 @@ type IKemenbiroService interface {
 	CreateKemenbiro(ctx context.Context, req *kemenbiro.CreateKemenbiroRequest) (*entity.Kemenbiro, error)
 	GetKemenbiroByAbbreviation(ctx context.Context, req *kemenbiro.GetKemenbiroByAbbreviationRequest) (*entity.Kemenbiro, error)
 	UpdateKemenbiro(ctx context.Context, req *kemenbiro.UpdateKemenbiroRequest) error
+	DeleteKemenbiro(ctx context.Context, req *kemenbiro.DeleteKemenbiroRequest) error
 }
 
 func NewKemenbiroService(r repository.IKemenbiroRepository) IKemenbiroService {

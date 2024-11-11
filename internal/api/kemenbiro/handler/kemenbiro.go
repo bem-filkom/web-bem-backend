@@ -74,3 +74,24 @@ func (h *KemenbiroHandler) UpdateKemenbiro() fiber.Handler {
 		return c.SendStatus(fiber.StatusNoContent)
 	}
 }
+
+func (h *KemenbiroHandler) DeleteKemenbiro() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var req kemenbiro.DeleteKemenbiroRequest
+		if err := c.ParamsParser(&req); err != nil {
+			return response.ErrUnprocessableEntity
+		}
+
+		queryUnescapedAbbr, err := url.QueryUnescape(req.Abbreviation)
+		if err != nil {
+			return response.ErrUnprocessableEntity
+		}
+		req.Abbreviation = queryUnescapedAbbr
+
+		if err := h.s.DeleteKemenbiro(c.Context(), &req); err != nil {
+			return err
+		}
+
+		return c.SendStatus(fiber.StatusNoContent)
+	}
+}

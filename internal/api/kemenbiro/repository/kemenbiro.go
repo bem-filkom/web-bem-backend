@@ -91,3 +91,25 @@ func (r *kemenbiroRepository) updateKemenbiro(ctx context.Context, tx sqlx.ExtCo
 func (r *kemenbiroRepository) UpdateKemenbiro(ctx context.Context, abbreviationAsID string, kemenbiro *entity.Kemenbiro) error {
 	return r.updateKemenbiro(ctx, r.db, abbreviationAsID, kemenbiro)
 }
+
+func (r *kemenbiroRepository) deleteKemenbiro(ctx context.Context, tx sqlx.ExtContext, abbreviation string) error {
+	result, err := tx.ExecContext(ctx, deleteKemenbiroQuery, abbreviation)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return errors.New("no rows affected")
+	}
+
+	return nil
+}
+
+func (r *kemenbiroRepository) DeleteKemenbiro(ctx context.Context, abbreviation string) error {
+	return r.deleteKemenbiro(ctx, r.db, abbreviation)
+}

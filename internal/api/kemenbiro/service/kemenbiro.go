@@ -93,3 +93,24 @@ func (s *kemenbiroService) UpdateKemenbiro(ctx context.Context, req *kemenbiro.U
 
 	return nil
 }
+
+func (s *kemenbiroService) DeleteKemenbiro(ctx context.Context, req *kemenbiro.DeleteKemenbiroRequest) error {
+	if err := validator.GetValidator().ValidateStruct(req); err != nil {
+		return response.ErrValidation.WithDetail(err)
+	}
+
+	err := s.r.DeleteKemenbiro(ctx, req.Abbreviation)
+	if err != nil {
+		if err.Error() == "no rows affected" {
+			return response.ErrNotFound
+		}
+
+		log.GetLogger().WithFields(map[string]any{
+			"error":   err,
+			"request": req,
+		}).Errorln("[KemenbiroService][DeleteKemenbiro] fail to delete kemenbiro")
+		return response.ErrInternalServerError
+	}
+
+	return nil
+}

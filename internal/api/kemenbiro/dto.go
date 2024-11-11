@@ -16,3 +16,7 @@ type UpdateKemenbiroRequest struct {
 	Name             string `json:"name" validate:"omitempty,max=255"`
 	Description      string `json:"description" validate:"omitempty,max=2000"`
 }
+
+type DeleteKemenbiroRequest struct {
+	Abbreviation string `param:"abbreviation" validate:"required"`
+}
