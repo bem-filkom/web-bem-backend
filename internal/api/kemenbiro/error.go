@@ -6,5 +6,7 @@ import (
 )
 
 var (
-	ErrAbbreviationAlreadyExists = response.NewError(http.StatusConflict, "KEMENBIRO_ABBREVIATION_ALREADY_EXISTS", "Singkatan kemenbiro yang kamu masukkan sudah ada. Coba lagi dengan singkatan yang berbeda atau minta kemenbiro yang sudah ada untuk mengubah singkatannya.")
+	ErrAbbreviationAlreadyExists = response.NewError(http.StatusConflict).
+		WithRefCode("KEMENBIRO_ABBREVIATION_ALREADY_EXISTS").
+		WithMessage("Singkatan kemenbiro yang kamu masukkan sudah ada. Coba lagi dengan singkatan yang berbeda atau minta kemenbiro yang sudah ada untuk mengubah singkatannya.")
 )

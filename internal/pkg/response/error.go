@@ -12,12 +12,15 @@ func (e *ErrorResponse) Error() string {
 	return e.Message
 }
 
-func NewError(httpStatusCode int, refCode, message string) *ErrorResponse {
+func NewError(httpStatusCode int) *ErrorResponse {
 	return &ErrorResponse{
 		HttpStatusCode: httpStatusCode,
-		Message:        message,
-		RefCode:        refCode,
 	}
+}
+
+func (e *ErrorResponse) WithMessage(message string) *ErrorResponse {
+	e.Message = message
+	return e
 }
 
 func (e *ErrorResponse) WithDetail(payload any) *ErrorResponse {
