@@ -19,4 +19,5 @@ func (h *KemenbiroHandler) Start(router fiber.Router) {
 	router = router.Group("/v2/kemenbiro")
 	router.Post("", timeout.NewWithContext(h.CreateKemenbiro(), 5*time.Second))
 	router.Get("/:abbreviation", timeout.NewWithContext(h.GetKemenbiroByAbbreviation(), 5*time.Second))
+	router.Patch("/:abbreviationAsID", timeout.NewWithContext(h.UpdateKemenbiro(), 5*time.Second))
 }

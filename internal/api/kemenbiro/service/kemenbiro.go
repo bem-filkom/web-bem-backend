@@ -50,7 +50,7 @@ func (s *kemenbiroService) GetKemenbiroByAbbreviation(ctx context.Context, req *
 	kemenbiroObj, err := s.r.GetKemenbiroByAbbreviation(ctx, req.Abbreviation)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, response.ErrorNotFound
+			return nil, response.ErrNotFound
 		}
 
 		log.GetLogger().WithFields(map[string]any{
@@ -61,4 +61,35 @@ func (s *kemenbiroService) GetKemenbiroByAbbreviation(ctx context.Context, req *
 	}
 
 	return kemenbiroObj, nil
+}
+
+func (s *kemenbiroService) UpdateKemenbiro(ctx context.Context, req *kemenbiro.UpdateKemenbiroRequest) error {
+	if err := validator.GetValidator().ValidateStruct(req); err != nil {
+		return response.ErrValidation.WithDetail(err)
+	}
+
+	updatedKemenbiro := &entity.Kemenbiro{
+		Name:         req.Name,
+		Abbreviation: req.Abbreviation,
+		Description:  sql.NullString{String: req.Description, Valid: req.Description != ""},
+	}
+
+	err := s.r.UpdateKemenbiro(ctx, req.AbbreviationAsID, updatedKemenbiro)
+	if err != nil {
+		if err.Error() == "no fields to update" {
+			return response.ErrNoUpdatedField
+		}
+
+		if err.Error() == "no rows affected" {
+			return response.ErrNotFound
+		}
+
+		log.GetLogger().WithFields(map[string]any{
+			"error":   err,
+			"request": req,
+		}).Errorln("[KemenbiroService][UpdateKemenbiro] fail to update kemenbiro")
+		return response.ErrInternalServerError
+	}
+
+	return nil
 }

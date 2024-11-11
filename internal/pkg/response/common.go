@@ -7,5 +7,6 @@ var (
 	ErrInternalServerError = NewError(http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "Ada kesalahan di server kami. Coba lagi, ya!")
 	ErrUnprocessableEntity = NewError(http.StatusUnprocessableEntity, "UNPROCESSABLE_ENTITY", "Ada kesalahan di data yang kamu masukkan.")
 	ErrValidation          = NewError(http.StatusBadRequest, "VALIDATION", "Ada kesalahan di data yang kamu masukkan.")
-	ErrorNotFound          = NewError(http.StatusNotFound, "NOT_FOUND", "Data yang kamu cari tidak ditemukan.")
+	ErrNotFound            = NewError(http.StatusNotFound, "NOT_FOUND", "Data yang kamu cari tidak ditemukan.")
+	ErrNoUpdatedField      = NewError(http.StatusBadRequest, "NO_UPDATED_FIELD", "Tidak ada data yang diperbarui.")
 )
