@@ -12,7 +12,7 @@ import (
 func (r *kemenbiroRepository) createKemenbiro(ctx context.Context, tx sqlx.ExtContext, kemenbiro *entity.Kemenbiro) (*entity.Kemenbiro, error) {
 	var kemenbiroObj entity.Kemenbiro
 
-	err := tx.QueryRowxContext(ctx, createKemenbiroQuery, kemenbiro.Abbreviation, kemenbiro.Name).StructScan(&kemenbiroObj)
+	err := tx.QueryRowxContext(ctx, createKemenbiroQuery, kemenbiro.Abbreviation, kemenbiro.Name, kemenbiro.Description).StructScan(&kemenbiroObj)
 	if err != nil {
 		return nil, err
 	}

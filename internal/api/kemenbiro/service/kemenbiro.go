@@ -20,9 +20,7 @@ func (s *kemenbiroService) CreateKemenbiro(ctx context.Context, req *kemenbiro.C
 	kemenbiroObj := &entity.Kemenbiro{
 		Name:         req.Name,
 		Abbreviation: req.Abbreviation,
-	}
-	if req.Description == "" {
-		kemenbiroObj.Description = sql.NullString{}
+		Description:  sql.NullString{String: req.Description, Valid: req.Description != ""},
 	}
 
 	id, err := s.r.CreateKemenbiro(ctx, kemenbiroObj)
