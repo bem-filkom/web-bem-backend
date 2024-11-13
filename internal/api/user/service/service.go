@@ -13,6 +13,7 @@ type userService struct {
 type IUserService interface {
 	SaveUser(ctx context.Context, req *user.SaveUserRequest) error
 	SaveStudent(ctx context.Context, req *user.SaveStudentRequest) error
+	CreateBemMember(ctx context.Context, req *user.CreateBemMemberRequest) error
 }
 
 func NewUserService(r repository.IUserRepository) IUserService {

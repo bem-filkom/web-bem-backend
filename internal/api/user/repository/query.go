@@ -1,26 +1,33 @@
 package repository
 
 var (
+	checkUserExistenceQuery = `
+		SELECT EXISTS(SELECT 1 FROM users WHERE id = $1)
+	`
+
 	createUserQuery = `
-		INSERT INTO users (id, email, full_name)
-		VALUES ($1, $2, $3)
-		ON CONFLICT (id) 
-		DO UPDATE SET 
-			email = EXCLUDED.email, 
-			full_name = EXCLUDED.full_name;
+		INSERT INTO users (id, email, full_name) VALUES ($1, $2, $3)
+	`
+
+	updateUserQuery = `
+		UPDATE users SET %s WHERE id = $%d
+	`
+
+	checkStudentExistenceQuery = `
+		SELECT EXISTS(SELECT 1 FROM students WHERE nim = $1)
 	`
 
 	createStudentQuery = `
 		INSERT INTO students (nim, program_studi, fakultas)
 		VALUES ($1, $2, $3)
-		ON CONFLICT (nim) 
-		DO UPDATE SET 
-			program_studi = EXCLUDED.program_studi, 
-			fakultas = EXCLUDED.fakultas;
+	`
+
+	updateStudentQuery = `
+		UPDATE students SET %s WHERE nim = $%d
 	`
 
 	createBemMemberQuery = `
-		INSERT INTO bem_members (nim, kemenbiro_id, position)
-		VALUES ($1, $2, $3)
+		INSERT INTO bem_members (nim, kemenbiro_id, position, period)
+		VALUES ($1, $2, $3, $4)
 	`
 )

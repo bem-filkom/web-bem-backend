@@ -8,6 +8,7 @@ import (
 	kemenbiroHnd "github.com/bem-filkom/web-bem-backend/internal/api/kemenbiro/handler"
 	kemenbiroRepo "github.com/bem-filkom/web-bem-backend/internal/api/kemenbiro/repository"
 	kemenbiroSvc "github.com/bem-filkom/web-bem-backend/internal/api/kemenbiro/service"
+	userHnd "github.com/bem-filkom/web-bem-backend/internal/api/user/handler"
 	userRepo "github.com/bem-filkom/web-bem-backend/internal/api/user/repository"
 	userSvc "github.com/bem-filkom/web-bem-backend/internal/api/user/service"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/env"
@@ -36,19 +37,20 @@ func NewServer(engine *fiber.App) *Server {
 }
 
 func (s *Server) RegisterHandlers() {
+	kemenbiroRepository := kemenbiroRepo.NewKemenbiroRepository(s.db)
+	kemenbiroService := kemenbiroSvc.NewKemenbiroService(kemenbiroRepository)
+	kemenbiroHandler := kemenbiroHnd.NewKemenbiroHandler(kemenbiroService)
+
 	userRepository := userRepo.NewUserRepository(s.db)
 	userService := userSvc.NewUserService(userRepository)
+	userHandler := userHnd.NewUserHandler(userService)
 
 	ubAuth := ubauth.NewUBAuth()
 	authService := service.NewAuthService(userService, ubAuth)
 	authHandler := authHnd.NewAuthHandler(authService)
 
-	kemenbiroRepository := kemenbiroRepo.NewKemenbiroRepository(s.db)
-	kemenbiroService := kemenbiroSvc.NewKemenbiroService(kemenbiroRepository)
-	kemenbiroHandler := kemenbiroHnd.NewKemenbiroHandler(kemenbiroService)
-
 	s.healthCheck()
-	s.handlers = append(s.handlers, authHandler, kemenbiroHandler)
+	s.handlers = append(s.handlers, kemenbiroHandler, userHandler, authHandler)
 }
 
 func (s *Server) Run() {

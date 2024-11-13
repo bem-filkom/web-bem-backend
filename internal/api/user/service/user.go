@@ -8,6 +8,7 @@ import (
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/log"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/response"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/validator"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 func (s *userService) SaveUser(ctx context.Context, req *user.SaveUserRequest) error {
@@ -61,6 +62,37 @@ func (s *userService) SaveStudent(ctx context.Context, req *user.SaveStudentRequ
 			return response.ErrTimeout
 		}
 
+		return response.ErrInternalServerError
+	}
+	return nil
+}
+
+func (s *userService) CreateBemMember(ctx context.Context, req *user.CreateBemMemberRequest) error {
+	if valErr := validator.GetValidator().ValidateStruct(req); valErr != nil {
+		log.GetLogger().WithFields(map[string]any{
+			"error":   valErr.Error(),
+			"request": req,
+		}).Error("[UserService][CreateBemMember] validation error")
+		return response.ErrValidation.WithDetail(valErr)
+	}
+
+	if err := s.r.CreateBemMember(ctx, &entity.BemMember{
+		NIM:         req.NIM,
+		KemenbiroID: req.KemenbiroID,
+		Position:    req.Position,
+	}); err != nil {
+		var pgErr *pgconn.PgError
+		_ = errors.As(err, &pgErr)
+		if ok := errors.As(err, &pgErr); ok {
+			if pgErr.Code == "23503" {
+				return response.ErrNotFound.WithMessage("Kemenbiro tidak ditemukan.")
+			}
+		}
+
+		log.GetLogger().WithFields(map[string]any{
+			"error":   err.Error(),
+			"request": req,
+		}).Error("[UserService][CreateBemMember] fail to promote student to BEM member")
 		return response.ErrInternalServerError
 	}
 	return nil
