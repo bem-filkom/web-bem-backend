@@ -12,6 +12,7 @@ type kemenbiroRepository struct {
 
 type IKemenbiroRepository interface {
 	CreateKemenbiro(ctx context.Context, kemenbiro *entity.Kemenbiro) (*entity.Kemenbiro, error)
+	GetAllKemenbiros(ctx context.Context) ([]entity.Kemenbiro, error)
 	GetKemenbiroByAbbreviation(ctx context.Context, abbreviation string) (*entity.Kemenbiro, error)
 	UpdateKemenbiro(ctx context.Context, abbreviationAsID string, kemenbiro *entity.Kemenbiro) error
 	DeleteKemenbiro(ctx context.Context, abbreviation string) error

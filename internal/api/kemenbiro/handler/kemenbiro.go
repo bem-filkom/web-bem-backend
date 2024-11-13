@@ -25,6 +25,19 @@ func (h *KemenbiroHandler) CreateKemenbiro() fiber.Handler {
 	}
 }
 
+func (h *KemenbiroHandler) GetAllKemenbiros() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		kemenbiros, err := h.s.GetAllKemenbiros(c.Context())
+		if err != nil {
+			return err
+		}
+
+		return c.JSON(map[string]interface{}{
+			"kemenbiros": kemenbiros,
+		})
+	}
+}
+
 func (h *KemenbiroHandler) GetKemenbiroByAbbreviation() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req kemenbiro.GetKemenbiroByAbbreviationRequest

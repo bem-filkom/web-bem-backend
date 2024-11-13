@@ -24,6 +24,21 @@ func (r *kemenbiroRepository) CreateKemenbiro(ctx context.Context, kemenbiro *en
 	return r.createKemenbiro(ctx, r.db, kemenbiro)
 }
 
+func (r *kemenbiroRepository) getAllKemenbiros(ctx context.Context, tx sqlx.ExtContext) ([]entity.Kemenbiro, error) {
+	var kemenbiros []entity.Kemenbiro
+
+	err := sqlx.SelectContext(ctx, tx, &kemenbiros, getAllKemenbirosQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	return kemenbiros, nil
+}
+
+func (r *kemenbiroRepository) GetAllKemenbiros(ctx context.Context) ([]entity.Kemenbiro, error) {
+	return r.getAllKemenbiros(ctx, r.db)
+}
+
 func (r *kemenbiroRepository) getKemenbiroByAbbreviation(ctx context.Context, tx sqlx.ExtContext, abbreviation string) (*entity.Kemenbiro, error) {
 	var kemenbiroObj entity.Kemenbiro
 

@@ -40,6 +40,18 @@ func (s *kemenbiroService) CreateKemenbiro(ctx context.Context, req *kemenbiro.C
 	return id, nil
 }
 
+func (s *kemenbiroService) GetAllKemenbiros(ctx context.Context) ([]entity.Kemenbiro, error) {
+	kemenbiros, err := s.r.GetAllKemenbiros(ctx)
+	if err != nil {
+		log.GetLogger().WithFields(map[string]any{
+			"error": err,
+		}).Errorln("[KemenbiroService][GetAllKemenbiros] fail to get all kemenbiros")
+		return nil, response.ErrInternalServerError
+	}
+
+	return kemenbiros, nil
+}
+
 func (s *kemenbiroService) GetKemenbiroByAbbreviation(ctx context.Context, req *kemenbiro.GetKemenbiroByAbbreviationRequest) (*entity.Kemenbiro, error) {
 	if err := validator.GetValidator().ValidateStruct(req); err != nil {
 		return nil, response.ErrValidation.WithDetail(err)
