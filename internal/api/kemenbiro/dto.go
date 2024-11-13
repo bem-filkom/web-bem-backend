@@ -6,8 +6,12 @@ type CreateKemenbiroRequest struct {
 	Description  string `json:"description" validate:"omitempty,max=2000"`
 }
 
+type GetKemenbiroByIDRequest struct {
+	ID string `param:"id" validate:"required,uuid"`
+}
+
 type GetKemenbiroByAbbreviationRequest struct {
-	Abbreviation string `param:"abbreviation" validate:"required"`
+	Abbreviation string `query:"abbreviation"`
 }
 
 type UpdateKemenbiroRequest struct {

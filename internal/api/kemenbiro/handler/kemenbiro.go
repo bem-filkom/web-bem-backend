@@ -25,31 +25,41 @@ func (h *KemenbiroHandler) CreateKemenbiro() fiber.Handler {
 	}
 }
 
-func (h *KemenbiroHandler) GetAllKemenbiros() fiber.Handler {
+func (h *KemenbiroHandler) GetKemenbiroByID() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		kemenbiros, err := h.s.GetAllKemenbiros(c.Context())
-		if err != nil {
-			return err
-		}
-
-		return c.JSON(map[string]interface{}{
-			"kemenbiros": kemenbiros,
-		})
-	}
-}
-
-func (h *KemenbiroHandler) GetKemenbiroByAbbreviation() fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		var req kemenbiro.GetKemenbiroByAbbreviationRequest
+		var req kemenbiro.GetKemenbiroByIDRequest
 		if err := c.ParamsParser(&req); err != nil {
 			return response.ErrUnprocessableEntity
 		}
 
-		queryUnescapedAbbr, err := url.QueryUnescape(req.Abbreviation)
+		kemenbiroObj, err := h.s.GetKemenbiroByID(c.Context(), &req)
 		if err != nil {
+			return err
+		}
+
+		return c.JSON(map[string]any{
+			"kemenbiro": kemenbiroObj,
+		})
+	}
+}
+
+func (h *KemenbiroHandler) GetKemenbiroWithQuery() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var req kemenbiro.GetKemenbiroByAbbreviationRequest
+		if err := c.QueryParser(&req); err != nil {
 			return response.ErrUnprocessableEntity
 		}
-		req.Abbreviation = queryUnescapedAbbr
+
+		if req.Abbreviation == "" {
+			kemenbiros, err := h.s.GetAllKemenbiros(c.Context())
+			if err != nil {
+				return err
+			}
+
+			return c.JSON(map[string]interface{}{
+				"kemenbiros": kemenbiros,
+			})
+		}
 
 		kemenbiroObj, err := h.s.GetKemenbiroByAbbreviation(c.Context(), &req)
 		if err != nil {

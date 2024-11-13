@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/entity"
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"strings"
 )
@@ -22,6 +23,21 @@ func (r *kemenbiroRepository) createKemenbiro(ctx context.Context, tx sqlx.ExtCo
 
 func (r *kemenbiroRepository) CreateKemenbiro(ctx context.Context, kemenbiro *entity.Kemenbiro) (*entity.Kemenbiro, error) {
 	return r.createKemenbiro(ctx, r.db, kemenbiro)
+}
+
+func (r *kemenbiroRepository) getKemenbiroByID(ctx context.Context, tx sqlx.ExtContext, id uuid.UUID) (*entity.Kemenbiro, error) {
+	var kemenbiroObj entity.Kemenbiro
+
+	err := tx.QueryRowxContext(ctx, getKemenbiroByIDQuery, id).StructScan(&kemenbiroObj)
+	if err != nil {
+		return nil, err
+	}
+
+	return &kemenbiroObj, nil
+}
+
+func (r *kemenbiroRepository) GetKemenbiroByID(ctx context.Context, id uuid.UUID) (*entity.Kemenbiro, error) {
+	return r.getKemenbiroByID(ctx, r.db, id)
 }
 
 func (r *kemenbiroRepository) getAllKemenbiros(ctx context.Context, tx sqlx.ExtContext) ([]entity.Kemenbiro, error) {

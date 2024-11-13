@@ -9,6 +9,7 @@ import (
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/log"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/response"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/validator"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
@@ -38,6 +39,27 @@ func (s *kemenbiroService) CreateKemenbiro(ctx context.Context, req *kemenbiro.C
 	}
 
 	return id, nil
+}
+
+func (s *kemenbiroService) GetKemenbiroByID(ctx context.Context, req *kemenbiro.GetKemenbiroByIDRequest) (*entity.Kemenbiro, error) {
+	if err := validator.GetValidator().ValidateStruct(req); err != nil {
+		return nil, response.ErrValidation.WithDetail(err)
+	}
+
+	kemenbiroObj, err := s.r.GetKemenbiroByID(ctx, uuid.MustParse(req.ID))
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, response.ErrNotFound
+		}
+
+		log.GetLogger().WithFields(map[string]any{
+			"error":   err,
+			"request": req,
+		}).Errorln("[KemenbiroService][GetKemenbiroByID] fail to get kemenbiro by ID")
+		return nil, response.ErrInternalServerError
+	}
+
+	return kemenbiroObj, nil
 }
 
 func (s *kemenbiroService) GetAllKemenbiros(ctx context.Context) ([]entity.Kemenbiro, error) {
