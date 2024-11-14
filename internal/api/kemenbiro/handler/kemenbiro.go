@@ -4,7 +4,6 @@ import (
 	"github.com/bem-filkom/web-bem-backend/internal/api/kemenbiro"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/response"
 	"github.com/gofiber/fiber/v2"
-	"net/url"
 )
 
 func (h *KemenbiroHandler) CreateKemenbiro() fiber.Handler {
@@ -80,12 +79,6 @@ func (h *KemenbiroHandler) UpdateKemenbiro() fiber.Handler {
 			return response.ErrUnprocessableEntity
 		}
 
-		queryUnescapedAbbr, err := url.QueryUnescape(req.AbbreviationAsID)
-		if err != nil {
-			return response.ErrUnprocessableEntity
-		}
-		req.AbbreviationAsID = queryUnescapedAbbr
-
 		if err := c.BodyParser(&req); err != nil {
 			return response.ErrUnprocessableEntity
 		}
@@ -104,12 +97,6 @@ func (h *KemenbiroHandler) DeleteKemenbiro() fiber.Handler {
 		if err := c.ParamsParser(&req); err != nil {
 			return response.ErrUnprocessableEntity
 		}
-
-		queryUnescapedAbbr, err := url.QueryUnescape(req.Abbreviation)
-		if err != nil {
-			return response.ErrUnprocessableEntity
-		}
-		req.Abbreviation = queryUnescapedAbbr
 
 		if err := h.s.DeleteKemenbiro(c.Context(), &req); err != nil {
 			return err

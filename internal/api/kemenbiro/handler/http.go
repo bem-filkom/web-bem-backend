@@ -26,12 +26,12 @@ func (h *KemenbiroHandler) Start(router fiber.Router) {
 	)
 	router.Get("/:id", timeout.NewWithContext(h.GetKemenbiroByID(), 5*time.Second))
 	router.Get("", timeout.NewWithContext(h.GetKemenbiroWithQuery(), 5*time.Second))
-	router.Patch("/:abbreviationAsID",
+	router.Patch("/:id",
 		middleware.Authenticate(),
 		middleware.RequireRole(entity.RoleBemMember),
 		timeout.NewWithContext(h.UpdateKemenbiro(), 5*time.Second),
 	)
-	router.Delete("/:abbreviation",
+	router.Delete("/:id",
 		middleware.Authenticate(),
 		middleware.RequireSuperAdmin(),
 		timeout.NewWithContext(h.DeleteKemenbiro(), 5*time.Second),

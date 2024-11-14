@@ -16,7 +16,7 @@ type IKemenbiroRepository interface {
 	GetAllKemenbiros(ctx context.Context) ([]entity.Kemenbiro, error)
 	GetKemenbiroByID(ctx context.Context, id uuid.UUID) (*entity.Kemenbiro, error)
 	GetKemenbiroByAbbreviation(ctx context.Context, abbreviation string) (*entity.Kemenbiro, error)
-	UpdateKemenbiro(ctx context.Context, abbreviationAsID string, kemenbiro *entity.Kemenbiro) error
+	UpdateKemenbiro(ctx context.Context, kemenbiro *entity.Kemenbiro) error
 	DeleteKemenbiro(ctx context.Context, abbreviation string) error
 }
 

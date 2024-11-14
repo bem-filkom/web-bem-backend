@@ -70,7 +70,7 @@ func (r *kemenbiroRepository) GetKemenbiroByAbbreviation(ctx context.Context, ab
 	return r.getKemenbiroByAbbreviation(ctx, r.db, abbreviation)
 }
 
-func (r *kemenbiroRepository) updateKemenbiro(ctx context.Context, tx sqlx.ExtContext, abbreviationAsID string, kemenbiro *entity.Kemenbiro) error {
+func (r *kemenbiroRepository) updateKemenbiro(ctx context.Context, tx sqlx.ExtContext, kemenbiro *entity.Kemenbiro) error {
 	var queryParts []string
 	var args []any
 	argIndex := 1
@@ -100,7 +100,7 @@ func (r *kemenbiroRepository) updateKemenbiro(ctx context.Context, tx sqlx.ExtCo
 		argIndex,
 	)
 
-	args = append(args, abbreviationAsID)
+	args = append(args, kemenbiro.ID)
 
 	result, err := tx.ExecContext(ctx, updateQuery, args...)
 	if err != nil {
@@ -119,8 +119,8 @@ func (r *kemenbiroRepository) updateKemenbiro(ctx context.Context, tx sqlx.ExtCo
 	return nil
 }
 
-func (r *kemenbiroRepository) UpdateKemenbiro(ctx context.Context, abbreviationAsID string, kemenbiro *entity.Kemenbiro) error {
-	return r.updateKemenbiro(ctx, r.db, abbreviationAsID, kemenbiro)
+func (r *kemenbiroRepository) UpdateKemenbiro(ctx context.Context, kemenbiro *entity.Kemenbiro) error {
+	return r.updateKemenbiro(ctx, r.db, kemenbiro)
 }
 
 func (r *kemenbiroRepository) deleteKemenbiro(ctx context.Context, tx sqlx.ExtContext, abbreviation string) error {

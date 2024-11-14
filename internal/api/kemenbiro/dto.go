@@ -15,12 +15,12 @@ type GetKemenbiroByAbbreviationRequest struct {
 }
 
 type UpdateKemenbiroRequest struct {
-	AbbreviationAsID string `param:"abbreviationAsID" validate:"required"`
-	Abbreviation     string `json:"abbreviation" validate:"omitempty,max=15"`
-	Name             string `json:"name" validate:"omitempty,max=255"`
-	Description      string `json:"description" validate:"omitempty,max=2000"`
+	ID           string `param:"id" validate:"required,uuid"`
+	Abbreviation string `json:"abbreviation" validate:"omitempty,max=15"`
+	Name         string `json:"name" validate:"omitempty,max=255"`
+	Description  string `json:"description" validate:"omitempty,max=2000"`
 }
 
 type DeleteKemenbiroRequest struct {
-	Abbreviation string `param:"abbreviation" validate:"required"`
+	ID string `param:"id" validate:"required,uuid"`
 }

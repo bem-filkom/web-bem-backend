@@ -8,6 +8,7 @@ import (
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/entity"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/log"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/response"
+	"github.com/bem-filkom/web-bem-backend/internal/pkg/utils"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/validator"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -100,14 +101,20 @@ func (s *kemenbiroService) UpdateKemenbiro(ctx context.Context, req *kemenbiro.U
 		return response.ErrValidation.WithDetail(err)
 	}
 
-	updatedKemenbiro := &entity.Kemenbiro{
+	kemenbiroID := uuid.MustParse(req.ID)
+
+	if err := utils.RequireKemenbiroID(ctx, kemenbiroID); err != nil {
+		return err
+	}
+
+	updates := &entity.Kemenbiro{
+		ID:           kemenbiroID,
 		Name:         req.Name,
 		Abbreviation: req.Abbreviation,
 		Description:  sql.NullString{String: req.Description, Valid: req.Description != ""},
 	}
 
-	err := s.r.UpdateKemenbiro(ctx, req.AbbreviationAsID, updatedKemenbiro)
-	if err != nil {
+	if err := s.r.UpdateKemenbiro(ctx, updates); err != nil {
 		if err.Error() == "no fields to update" {
 			return response.ErrNoUpdatedField
 		}
@@ -131,7 +138,7 @@ func (s *kemenbiroService) DeleteKemenbiro(ctx context.Context, req *kemenbiro.D
 		return response.ErrValidation.WithDetail(err)
 	}
 
-	err := s.r.DeleteKemenbiro(ctx, req.Abbreviation)
+	err := s.r.DeleteKemenbiro(ctx, req.ID)
 	if err != nil {
 		if err.Error() == "no rows affected" {
 			return response.ErrNotFound
