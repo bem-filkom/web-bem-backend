@@ -86,6 +86,8 @@ func (s *userService) CreateBemMember(ctx context.Context, req *user.CreateBemMe
 		if ok := errors.As(err, &pgErr); ok {
 			if pgErr.Code == "23503" {
 				return response.ErrNotFound.WithMessage("Kemenbiro tidak ditemukan.")
+			} else if pgErr.Code == "23505" {
+				return user.ErrAlreadyBemMember
 			}
 		}
 
