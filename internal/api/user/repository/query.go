@@ -26,9 +26,14 @@ var (
 		UPDATE students SET %s WHERE nim = $%d
 	`
 
-	createBemMemberQuery = `
+	createBemMemberQueryWithPeriod = `
 		INSERT INTO bem_members (nim, kemenbiro_id, position, period)
 		VALUES ($1, $2, $3, $4)
+	`
+
+	createBemMemberQueryWithoutPeriod = `
+		INSERT INTO bem_members (nim, kemenbiro_id, position)
+		VALUES ($1, $2, $3)
 	`
 
 	getRoleQuery = `

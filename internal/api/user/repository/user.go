@@ -168,7 +168,15 @@ func (r *userRepository) SaveStudent(ctx context.Context, student *entity.Studen
 }
 
 func (r *userRepository) promoteToBemMember(ctx context.Context, tx sqlx.ExtContext, bemMember *entity.BemMember) error {
-	_, err := tx.ExecContext(ctx, createBemMemberQuery, bemMember.NIM, bemMember.KemenbiroID, bemMember.Position, bemMember.Period)
+	query := createBemMemberQueryWithoutPeriod
+	args := []interface{}{bemMember.NIM, bemMember.KemenbiroID, bemMember.Position}
+
+	if bemMember.Period != 0 {
+		query = createBemMemberQueryWithPeriod
+		args = append(args, bemMember.Period)
+	}
+
+	_, err := tx.ExecContext(ctx, query, args...)
 	return err
 }
 
