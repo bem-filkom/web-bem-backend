@@ -2,27 +2,56 @@ package jwt
 
 import "C"
 import (
+	"encoding/json"
+	"github.com/bem-filkom/web-bem-backend/internal/pkg/entity"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/env"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"time"
 )
 
 type Claims struct {
 	jwt.RegisteredClaims
-	KemenbiroID string `json:"kemenbiro_id,omitempty"`
+	IsSuperAdmin          bool            `json:"is_super_admin"`
+	Role                  entity.UserRole `json:"role"`
+	KemenbiroID           uuid.UUID       `json:"kemenbiro_id,omitempty"`
+	KemenbiroAbbreviation string          `json:"kemenbiro_abbreviation,omitempty"`
+}
+
+func (c Claims) MarshalJSON() ([]byte, error) {
+	type Alias Claims
+	aux := &struct {
+		KemenbiroID *uuid.UUID `json:"kemenbiro_id,omitempty"`
+		*Alias
+	}{
+		Alias: (*Alias)(&c),
+	}
+
+	if c.KemenbiroID != uuid.Nil {
+		aux.KemenbiroID = &c.KemenbiroID
+	}
+
+	return json.Marshal(aux)
 }
 
 type CreateRequest struct {
-	Subject     string
-	KemenbiroID string
+	Subject               string
+	IsSuperAdmin          bool
+	Role                  entity.UserRole
+	KemenbiroID           uuid.UUID
+	KemenbiroAbbreviation string
 }
 
-func Create(req *CreateRequest) (string, error) {
+func CreateAccessToken(req *CreateRequest) (string, error) {
 	claims := Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   req.Subject,
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(env.GetEnv().JwtAccessExpireTime)),
 		},
+		Role:                  req.Role,
+		KemenbiroID:           req.KemenbiroID,
+		KemenbiroAbbreviation: req.KemenbiroAbbreviation,
+		IsSuperAdmin:          req.KemenbiroAbbreviation == "PIT",
 	}
 
 	unsignedJWT := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -34,7 +63,7 @@ func Create(req *CreateRequest) (string, error) {
 	return signedJWT, nil
 }
 
-func Decode(tokenString string, claims *Claims) error {
+func DecodeAccessToken(tokenString string, claims *Claims) error {
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
 		return env.GetEnv().JwtAccessSecretKey, nil
 	})

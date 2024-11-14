@@ -5,6 +5,15 @@ import (
 	"time"
 )
 
+type UserRole string
+
+const (
+	RoleUser         UserRole = "user"
+	RoleStudent      UserRole = "student"
+	RoleBemMember    UserRole = "bem_member"
+	RoleUnregistered UserRole = "unregistered"
+)
+
 type User struct {
 	ID        string    `json:"id,omitempty"`
 	Email     string    `json:"email,omitempty"`

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/entity"
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"strings"
 )
@@ -199,4 +200,43 @@ func (r *userRepository) CreateBemMember(ctx context.Context, bemMember *entity.
 	}
 
 	return tx.Commit()
+}
+
+func (r *userRepository) getBemMemberByNIM(ctx context.Context, tx sqlx.ExtContext, nim string) (*entity.BemMember, error) {
+	var bemMember struct {
+		NIM          string
+		KemenbiroID  uuid.UUID `db:"kemenbiro_id"`
+		Position     string
+		Period       int
+		Abbreviation string
+	}
+
+	if err := tx.QueryRowxContext(ctx, getBemMemberByNIMQuery, nim).StructScan(&bemMember); err != nil {
+		return nil, err
+	}
+
+	return &entity.BemMember{
+		NIM:         bemMember.NIM,
+		KemenbiroID: bemMember.KemenbiroID,
+		Kemenbiro:   &entity.Kemenbiro{Abbreviation: bemMember.Abbreviation},
+		Position:    bemMember.Position,
+		Period:      bemMember.Period,
+	}, nil
+}
+
+func (r *userRepository) GetBemMemberByNIM(ctx context.Context, nim string) (*entity.BemMember, error) {
+	return r.getBemMemberByNIM(ctx, r.db, nim)
+}
+
+func (r *userRepository) getRole(ctx context.Context, tx sqlx.ExtContext, nim string) (entity.UserRole, error) {
+	var role entity.UserRole
+	if err := tx.QueryRowxContext(ctx, getRoleQuery, nim).Scan(&role); err != nil {
+		return role, err
+	}
+
+	return role, nil
+}
+
+func (r *userRepository) GetRole(ctx context.Context, nim string) (entity.UserRole, error) {
+	return r.getRole(ctx, r.db, nim)
 }

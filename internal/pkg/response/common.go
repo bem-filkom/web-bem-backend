@@ -26,4 +26,12 @@ var (
 	ErrNoUpdatedField = NewError(http.StatusBadRequest).
 				WithRefCode("NO_UPDATED_FIELD").
 				WithMessage("Tidak ada data yang diperbarui.")
+
+	ErrForbiddenRole = NewError(http.StatusForbidden).
+				WithRefCode("FORBIDDEN_ROLE").
+				WithMessage("Kamu tidak diizinkan untuk melakukan ini.")
+
+	ErrForbiddenKemenbiro = NewError(http.StatusForbidden).
+				WithRefCode("FORBIDDEN_KEMENBIRO").
+				WithMessage("Kamu bukan bagian dari Kemenbiro ini.")
 )

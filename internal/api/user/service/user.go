@@ -97,3 +97,43 @@ func (s *userService) CreateBemMember(ctx context.Context, req *user.CreateBemMe
 	}
 	return nil
 }
+
+func (s *userService) GetBemMemberByNIM(ctx context.Context, req *user.GetUserRequest) (*entity.BemMember, error) {
+	if valErr := validator.GetValidator().ValidateStruct(req); valErr != nil {
+		log.GetLogger().WithFields(map[string]any{
+			"error":   valErr.Error(),
+			"request": req,
+		}).Error("[UserService][GetBemMemberByNIM] validation error")
+		return nil, response.ErrValidation.WithDetail(valErr)
+	}
+
+	bemMember, err := s.r.GetBemMemberByNIM(ctx, req.ID)
+	if err != nil {
+		log.GetLogger().WithFields(map[string]any{
+			"error":   err.Error(),
+			"request": req,
+		}).Error("[UserService][GetBemMemberByNIM] fail to get BEM member from database")
+		return nil, response.ErrInternalServerError
+	}
+	return bemMember, nil
+}
+
+func (s *userService) GetRole(ctx context.Context, req *user.GetUserRequest) (entity.UserRole, error) {
+	if valErr := validator.GetValidator().ValidateStruct(req); valErr != nil {
+		log.GetLogger().WithFields(map[string]any{
+			"error":   valErr.Error(),
+			"request": req,
+		}).Error("[UserService][GetRole] validation error")
+		return entity.RoleUnregistered, response.ErrValidation.WithDetail(valErr)
+	}
+
+	role, err := s.r.GetRole(ctx, req.ID)
+	if err != nil {
+		log.GetLogger().WithFields(map[string]any{
+			"error":   err.Error(),
+			"request": req,
+		}).Error("[UserService][GetRole] fail to get role from database")
+		return role, response.ErrInternalServerError
+	}
+	return role, nil
+}

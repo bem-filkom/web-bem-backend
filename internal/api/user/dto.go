@@ -22,3 +22,7 @@ type CreateBemMemberRequest struct {
 	Position    string    `json:"position" validate:"required,max=255"`
 	Period      int       `json:"period" validate:"omitempty,number"`
 }
+
+type GetUserRequest struct {
+	ID string `json:"id" validate:"required,len=15,number"`
+}
