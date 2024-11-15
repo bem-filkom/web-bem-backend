@@ -60,4 +60,8 @@ var (
 		    JOIN kemenbiros k ON b.kemenbiro_id = k.id 
 		WHERE b.nim = $1
 	`
+
+	updateBemMemberQuery = `
+		UPDATE bem_members SET %s WHERE nim = $%d
+	`
 )

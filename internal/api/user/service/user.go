@@ -10,6 +10,7 @@ import (
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/response"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/utils"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/validator"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
@@ -170,6 +171,47 @@ func (s *userService) GetBemMemberByNIM(ctx context.Context, req *user.GetUserRe
 		return nil, response.ErrInternalServerError
 	}
 	return bemMember, nil
+}
+
+func (s *userService) UpdateBemMember(ctx context.Context, req *user.UpdateBemMemberRequest) error {
+	if valErr := validator.GetValidator().ValidateStruct(req); valErr != nil {
+		log.GetLogger().WithFields(map[string]any{
+			"error":   valErr.Error(),
+			"request": req,
+		}).Error("[UserService][UpdateBemMember] validation error")
+		return response.ErrValidation.WithDetail(valErr)
+	}
+
+	original, err := s.GetBemMemberByNIM(ctx, &user.GetUserRequest{ID: req.NIM})
+	if err != nil {
+		return err
+	}
+
+	if !ctx.Value("user.is_super_admin").(bool) && (req.KemenbiroID != uuid.Nil && req.KemenbiroID != original.KemenbiroID) {
+		return response.ErrForbiddenSuperAdmin.WithMessage("Kamu tidak memilizi izin untuk mengubah kemenbiro dari anggota BEM. Silakan hubungi PIT.")
+	}
+
+	if err := utils.RequireKemenbiroID(ctx, original.KemenbiroID); err != nil {
+		return err
+	}
+
+	if err := s.r.UpdateBemMember(ctx, &entity.BemMember{
+		NIM:         req.NIM,
+		KemenbiroID: req.KemenbiroID,
+		Position:    req.Position,
+		Period:      req.Period,
+	}); err != nil {
+		if err.Error() == "no fields to update" {
+			return response.ErrNoUpdatedField
+		}
+
+		log.GetLogger().WithFields(map[string]any{
+			"error":   err.Error(),
+			"request": req,
+		}).Error("[UserService][UpdateBemMember] fail to update BEM member in database")
+		return response.ErrInternalServerError
+	}
+	return nil
 }
 
 func (s *userService) GetRole(ctx context.Context, req *user.GetUserRequest) (entity.UserRole, error) {

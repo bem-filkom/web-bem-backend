@@ -17,6 +17,7 @@ type IUserRepository interface {
 	GetStudentByNIM(ctx context.Context, nim string) (*entity.Student, error)
 	CreateBemMember(ctx context.Context, bemMember *entity.BemMember) error
 	GetBemMemberByNIM(ctx context.Context, nim string) (*entity.BemMember, error)
+	UpdateBemMember(ctx context.Context, updates *entity.BemMember) error
 	GetRole(ctx context.Context, nim string) (entity.UserRole, error)
 }
 

@@ -18,6 +18,7 @@ type IUserService interface {
 	GetStudentByNIM(ctx context.Context, req *user.GetUserRequest) (*entity.Student, error)
 	CreateBemMember(ctx context.Context, req *user.CreateBemMemberRequest) error
 	GetBemMemberByNIM(ctx context.Context, req *user.GetUserRequest) (*entity.BemMember, error)
+	UpdateBemMember(ctx context.Context, req *user.UpdateBemMemberRequest) error
 	GetRole(ctx context.Context, req *user.GetUserRequest) (entity.UserRole, error)
 }
 

@@ -26,3 +26,10 @@ type CreateBemMemberRequest struct {
 type GetUserRequest struct {
 	ID string `json:"id" validate:"required,len=15,number"`
 }
+
+type UpdateBemMemberRequest struct {
+	NIM         string    `param:"nim" validate:"required,len=15,number"`
+	KemenbiroID uuid.UUID `json:"kemenbiro_id" validate:"omitempty,uuid"`
+	Position    string    `json:"position" validate:"omitempty,max=255"`
+	Period      int       `json:"period" validate:"omitempty,number"`
+}

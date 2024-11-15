@@ -20,3 +20,23 @@ func (h *UserHandler) CreateBemMember() fiber.Handler {
 		return c.SendStatus(fiber.StatusCreated)
 	}
 }
+
+func (h *UserHandler) UpdateBemMember() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var req user.UpdateBemMemberRequest
+
+		if err := c.ParamsParser(&req); err != nil {
+			return response.ErrUnprocessableEntity
+		}
+
+		if err := c.BodyParser(&req); err != nil {
+			return response.ErrUnprocessableEntity
+		}
+
+		if err := h.s.UpdateBemMember(c.Context(), &req); err != nil {
+			return err
+		}
+
+		return c.SendStatus(fiber.StatusNoContent)
+	}
+}

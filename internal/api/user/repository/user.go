@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/entity"
 	"github.com/google/uuid"
@@ -264,6 +265,58 @@ func (r *userRepository) getBemMemberByNIM(ctx context.Context, tx sqlx.ExtConte
 
 func (r *userRepository) GetBemMemberByNIM(ctx context.Context, nim string) (*entity.BemMember, error) {
 	return r.getBemMemberByNIM(ctx, r.db, nim)
+}
+
+func (r *userRepository) updateBemMember(ctx context.Context, tx sqlx.ExtContext, updates *entity.BemMember) error {
+	var queryParts []string
+	var args []any
+	argIndex := 1
+
+	if updates.KemenbiroID != uuid.Nil {
+		queryParts = append(queryParts, fmt.Sprintf("kemenbiro_id = $%d", argIndex))
+		args = append(args, updates.KemenbiroID)
+		argIndex++
+	}
+
+	if updates.Position != "" {
+		queryParts = append(queryParts, fmt.Sprintf("position = $%d", argIndex))
+		args = append(args, updates.Position)
+		argIndex++
+	}
+	if updates.Period != 0 {
+		queryParts = append(queryParts, fmt.Sprintf("period = $%d", argIndex))
+		args = append(args, updates.Period)
+		argIndex++
+	}
+
+	if len(queryParts) == 0 {
+		return errors.New("no fields to update")
+	}
+
+	updateQuery := fmt.Sprintf(updateBemMemberQuery,
+		strings.Join(queryParts, ", "),
+		argIndex)
+	args = append(args, updates.NIM)
+
+	result, err := tx.ExecContext(ctx, updateQuery, args...)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("no rows affected")
+	}
+
+	return nil
+}
+
+func (r *userRepository) UpdateBemMember(ctx context.Context, updates *entity.BemMember) error {
+	return r.updateBemMember(ctx, r.db, updates)
 }
 
 func (r *userRepository) getRole(ctx context.Context, tx sqlx.ExtContext, nim string) (entity.UserRole, error) {
