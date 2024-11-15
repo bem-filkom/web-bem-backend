@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS program_kerja_penanggung_jawabs;
