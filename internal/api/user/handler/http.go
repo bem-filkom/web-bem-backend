@@ -30,4 +30,9 @@ func (h *UserHandler) Start(router fiber.Router) {
 		middleware.Authenticate(),
 		middleware.RequireRole(entity.RoleBemMember),
 		timeout.NewWithContext(h.UpdateBemMember(), 5*time.Second))
+
+	router.Delete("/bem-member/:nim",
+		middleware.Authenticate(),
+		middleware.RequireRole(entity.RoleBemMember),
+		timeout.NewWithContext(h.DeleteBemMember(), 5*time.Second))
 }

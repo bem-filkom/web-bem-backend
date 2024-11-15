@@ -40,3 +40,18 @@ func (h *UserHandler) UpdateBemMember() fiber.Handler {
 		return c.SendStatus(fiber.StatusNoContent)
 	}
 }
+
+func (h *UserHandler) DeleteBemMember() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var req user.DeleteBemMemberRequest
+		if err := c.ParamsParser(&req); err != nil {
+			return response.ErrUnprocessableEntity
+		}
+
+		if err := h.s.DeleteBemMember(c.Context(), &req); err != nil {
+			return err
+		}
+
+		return c.SendStatus(fiber.StatusNoContent)
+	}
+}

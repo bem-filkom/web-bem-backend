@@ -164,6 +164,10 @@ func (s *userService) GetBemMemberByNIM(ctx context.Context, req *user.GetUserRe
 
 	bemMember, err := s.r.GetBemMemberByNIM(ctx, req.ID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, response.ErrNotFound
+		}
+
 		log.GetLogger().WithFields(map[string]any{
 			"error":   err.Error(),
 			"request": req,
@@ -209,6 +213,38 @@ func (s *userService) UpdateBemMember(ctx context.Context, req *user.UpdateBemMe
 			"error":   err.Error(),
 			"request": req,
 		}).Error("[UserService][UpdateBemMember] fail to update BEM member in database")
+		return response.ErrInternalServerError
+	}
+	return nil
+}
+
+func (s *userService) DeleteBemMember(ctx context.Context, req *user.DeleteBemMemberRequest) error {
+	if valErr := validator.GetValidator().ValidateStruct(req); valErr != nil {
+		log.GetLogger().WithFields(map[string]any{
+			"error":   valErr.Error(),
+			"request": req,
+		}).Error("[UserService][DeleteBemMember] validation error")
+		return response.ErrValidation.WithDetail(valErr)
+	}
+
+	bemMember, err := s.GetBemMemberByNIM(ctx, &user.GetUserRequest{ID: req.NIM})
+	if err != nil {
+		return err
+	}
+
+	if err := utils.RequireKemenbiroID(ctx, bemMember.KemenbiroID); err != nil {
+		return err
+	}
+
+	if err := s.r.DeleteBemMember(ctx, req.NIM); err != nil {
+		if err.Error() == "no rows affected" {
+			return response.ErrNotFound
+		}
+
+		log.GetLogger().WithFields(map[string]any{
+			"error":   err.Error(),
+			"request": req,
+		}).Error("[UserService][DeleteBemMember] fail to delete BEM member from database")
 		return response.ErrInternalServerError
 	}
 	return nil

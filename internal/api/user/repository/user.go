@@ -319,6 +319,28 @@ func (r *userRepository) UpdateBemMember(ctx context.Context, updates *entity.Be
 	return r.updateBemMember(ctx, r.db, updates)
 }
 
+func (r *userRepository) deleteBemMember(ctx context.Context, tx sqlx.ExtContext, nim string) error {
+	result, err := tx.ExecContext(ctx, deleteBemMemberQuery, nim)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return errors.New("no rows affected")
+	}
+
+	return nil
+}
+
+func (r *userRepository) DeleteBemMember(ctx context.Context, nim string) error {
+	return r.deleteBemMember(ctx, r.db, nim)
+}
+
 func (r *userRepository) getRole(ctx context.Context, tx sqlx.ExtContext, nim string) (entity.UserRole, error) {
 	var role entity.UserRole
 	if err := tx.QueryRowxContext(ctx, getRoleQuery, nim).Scan(&role); err != nil {

@@ -64,4 +64,8 @@ var (
 	updateBemMemberQuery = `
 		UPDATE bem_members SET %s WHERE nim = $%d
 	`
+
+	deleteBemMemberQuery = `
+		DELETE FROM bem_members WHERE nim = $1
+	`
 )

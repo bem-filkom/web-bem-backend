@@ -33,3 +33,7 @@ type UpdateBemMemberRequest struct {
 	Position    string    `json:"position" validate:"omitempty,max=255"`
 	Period      int       `json:"period" validate:"omitempty,number"`
 }
+
+type DeleteBemMemberRequest struct {
+	NIM string `param:"nim" validate:"required,len=15,number"`
+}
