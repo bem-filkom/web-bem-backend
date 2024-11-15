@@ -34,4 +34,8 @@ var (
 	ErrForbiddenKemenbiro = NewError(http.StatusForbidden).
 				WithRefCode("FORBIDDEN_KEMENBIRO").
 				WithMessage("Kamu bukan bagian dari Kemenbiro ini.")
+
+	ErrForbiddenSuperAdmin = NewError(http.StatusForbidden).
+				WithRefCode("FORBIDDEN_SUPER_ADMIN").
+				WithMessage("Silakan hubungi PIT untuk melakukan ini.")
 )

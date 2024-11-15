@@ -23,7 +23,7 @@ func RequireSuperAdmin() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		isSuperAdmin := c.Locals("user.is_super_admin").(bool)
 		if !isSuperAdmin {
-			return response.ErrForbiddenRole
+			return response.ErrForbiddenSuperAdmin
 		}
 
 		return c.Next()
