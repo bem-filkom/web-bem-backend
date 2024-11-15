@@ -40,8 +40,8 @@ func (r *kemenbiroRepository) GetKemenbiroByID(ctx context.Context, id uuid.UUID
 	return r.getKemenbiroByID(ctx, r.db, id)
 }
 
-func (r *kemenbiroRepository) getAllKemenbiros(ctx context.Context, tx sqlx.ExtContext) ([]entity.Kemenbiro, error) {
-	var kemenbiros []entity.Kemenbiro
+func (r *kemenbiroRepository) getAllKemenbiros(ctx context.Context, tx sqlx.ExtContext) ([]*entity.Kemenbiro, error) {
+	var kemenbiros []*entity.Kemenbiro
 
 	err := sqlx.SelectContext(ctx, tx, &kemenbiros, getAllKemenbirosQuery)
 	if err != nil {
@@ -51,7 +51,7 @@ func (r *kemenbiroRepository) getAllKemenbiros(ctx context.Context, tx sqlx.ExtC
 	return kemenbiros, nil
 }
 
-func (r *kemenbiroRepository) GetAllKemenbiros(ctx context.Context) ([]entity.Kemenbiro, error) {
+func (r *kemenbiroRepository) GetAllKemenbiros(ctx context.Context) ([]*entity.Kemenbiro, error) {
 	return r.getAllKemenbiros(ctx, r.db)
 }
 

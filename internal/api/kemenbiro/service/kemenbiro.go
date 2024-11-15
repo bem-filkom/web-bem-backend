@@ -47,7 +47,7 @@ func (s *kemenbiroService) GetKemenbiroByID(ctx context.Context, req *kemenbiro.
 		return nil, response.ErrValidation.WithDetail(err)
 	}
 
-	kemenbiroObj, err := s.r.GetKemenbiroByID(ctx, uuid.MustParse(req.ID))
+	kemenbiroObj, err := s.r.GetKemenbiroByID(ctx, req.ID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, response.ErrNotFound
@@ -63,7 +63,7 @@ func (s *kemenbiroService) GetKemenbiroByID(ctx context.Context, req *kemenbiro.
 	return kemenbiroObj, nil
 }
 
-func (s *kemenbiroService) GetAllKemenbiros(ctx context.Context) ([]entity.Kemenbiro, error) {
+func (s *kemenbiroService) GetAllKemenbiros(ctx context.Context) ([]*entity.Kemenbiro, error) {
 	kemenbiros, err := s.r.GetAllKemenbiros(ctx)
 	if err != nil {
 		log.GetLogger().WithFields(map[string]any{
@@ -94,6 +94,21 @@ func (s *kemenbiroService) GetKemenbiroByAbbreviation(ctx context.Context, req *
 	}
 
 	return kemenbiroObj, nil
+}
+
+func (s *kemenbiroService) GetModifiableKemenbiros(ctx context.Context) ([]*entity.Kemenbiro, error) {
+	if ctx.Value("user.is_super_admin").(bool) {
+		return s.GetAllKemenbiros(ctx)
+	}
+
+	kemenbiroObj, err := s.GetKemenbiroByID(ctx, &kemenbiro.GetKemenbiroByIDRequest{
+		ID: ctx.Value("user.kemenbiro_id").(uuid.UUID),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return []*entity.Kemenbiro{kemenbiroObj}, nil
 }
 
 func (s *kemenbiroService) UpdateKemenbiro(ctx context.Context, req *kemenbiro.UpdateKemenbiroRequest) error {

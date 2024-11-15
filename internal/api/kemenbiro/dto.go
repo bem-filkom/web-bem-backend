@@ -1,5 +1,7 @@
 package kemenbiro
 
+import "github.com/google/uuid"
+
 type CreateKemenbiroRequest struct {
 	Abbreviation string `json:"abbreviation" validate:"required,max=15"`
 	Name         string `json:"name" validate:"required,max=255"`
@@ -7,7 +9,7 @@ type CreateKemenbiroRequest struct {
 }
 
 type GetKemenbiroByIDRequest struct {
-	ID string `param:"id" validate:"required,uuid"`
+	ID uuid.UUID `param:"id" validate:"required,uuid"`
 }
 
 type GetKemenbiroByAbbreviationRequest struct {

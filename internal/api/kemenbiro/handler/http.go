@@ -24,6 +24,11 @@ func (h *KemenbiroHandler) Start(router fiber.Router) {
 		middleware.RequireSuperAdmin(),
 		timeout.NewWithContext(h.CreateKemenbiro(), 5*time.Second),
 	)
+	router.Get("/modifiable",
+		middleware.Authenticate(),
+		middleware.RequireRole(entity.RoleBemMember),
+		timeout.NewWithContext(h.GetModifiableKemenbiro(), 5*time.Second),
+	)
 	router.Get("/:id", timeout.NewWithContext(h.GetKemenbiroByID(), 5*time.Second))
 	router.Get("", timeout.NewWithContext(h.GetKemenbiroWithQuery(), 5*time.Second))
 	router.Patch("/:id",
