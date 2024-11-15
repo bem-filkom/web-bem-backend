@@ -7,6 +7,7 @@ import (
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/entity"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/log"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/response"
+	"github.com/bem-filkom/web-bem-backend/internal/pkg/utils"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/validator"
 	"github.com/jackc/pgx/v5/pgconn"
 )
@@ -74,6 +75,10 @@ func (s *userService) CreateBemMember(ctx context.Context, req *user.CreateBemMe
 			"request": req,
 		}).Error("[UserService][CreateBemMember] validation error")
 		return response.ErrValidation.WithDetail(valErr)
+	}
+
+	if err := utils.RequireKemenbiroID(ctx, req.KemenbiroID); err != nil {
+		return err
 	}
 
 	if err := s.r.CreateBemMember(ctx, &entity.BemMember{
