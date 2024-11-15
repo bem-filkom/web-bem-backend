@@ -17,5 +17,5 @@ func NewAuthHandler(s service.IAuthService) *AuthHandler {
 
 func (h *AuthHandler) Start(router fiber.Router) {
 	router = router.Group("/v2/auth")
-	router.Post("/login", timeout.NewWithContext(h.Login(), 10*time.Second))
+	router.Post("/ub/login", timeout.NewWithContext(h.LoginUB(), 10*time.Second))
 }

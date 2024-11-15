@@ -13,7 +13,7 @@ import (
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/validator"
 )
 
-func (s *authService) LoginAuthUb(ctx context.Context, req *auth.LoginRequest) (*auth.LoginResponse, error) {
+func (s *authService) LoginUB(ctx context.Context, req *auth.LoginRequest) (*auth.LoginResponse, error) {
 	if err := validator.GetValidator().ValidateStruct(req); err != nil {
 		return nil, response.ErrValidation.WithDetail(err)
 	}
@@ -27,7 +27,7 @@ func (s *authService) LoginAuthUb(ctx context.Context, req *auth.LoginRequest) (
 			log.GetLogger().WithFields(map[string]interface{}{
 				"error":    err.Error(),
 				"username": req.Username,
-			}).Error("[AuthService][LoginAuthUb] fail to authenticate user")
+			}).Error("[AuthService][LoginUB] fail to authenticate user")
 		}
 
 		switch respErr.Message {
@@ -37,7 +37,7 @@ func (s *authService) LoginAuthUb(ctx context.Context, req *auth.LoginRequest) (
 			log.GetLogger().WithFields(map[string]interface{}{
 				"error":    respErr.Error(),
 				"username": req.Username,
-			}).Error("[AuthService][LoginAuthUb] fail to authenticate user")
+			}).Error("[AuthService][LoginUB] fail to authenticate user")
 			return nil, response.ErrInternalServerError
 		}
 	}
@@ -71,7 +71,7 @@ func (s *authService) LoginAuthUb(ctx context.Context, req *auth.LoginRequest) (
 		log.GetLogger().WithFields(map[string]interface{}{
 			"error":           err.Error(),
 			"student_details": studentDetails,
-		}).Error("[AuthService][LoginAuthUb] fail to get role")
+		}).Error("[AuthService][LoginUB] fail to get role")
 		return nil, response.ErrInternalServerError
 	}
 	jwtCreateReq.Role = role
@@ -83,7 +83,7 @@ func (s *authService) LoginAuthUb(ctx context.Context, req *auth.LoginRequest) (
 			log.GetLogger().WithFields(map[string]interface{}{
 				"error":           err.Error(),
 				"student_details": studentDetails,
-			}).Error("[AuthService][LoginAuthUb] fail to get bem member")
+			}).Error("[AuthService][LoginUB] fail to get bem member")
 			return nil, response.ErrInternalServerError
 		}
 		jwtCreateReq.KemenbiroID = bemMember.KemenbiroID
@@ -110,7 +110,7 @@ func (s *authService) LoginAuthUb(ctx context.Context, req *auth.LoginRequest) (
 		log.GetLogger().WithFields(map[string]interface{}{
 			"error":    err.Error(),
 			"username": req.Username,
-		}).Error("[AuthService][LoginAuthUb] fail to create jwt access token")
+		}).Error("[AuthService][LoginUB] fail to create jwt access token")
 		return nil, response.ErrInternalServerError
 	}
 	res.AccessToken = accessToken

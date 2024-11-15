@@ -6,14 +6,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func (h *AuthHandler) Login() fiber.Handler {
+func (h *AuthHandler) LoginUB() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req auth.LoginRequest
 		if err := c.BodyParser(&req); err != nil {
 			return response.ErrUnprocessableEntity
 		}
 
-		res, err := h.s.LoginAuthUb(c.Context(), &req)
+		res, err := h.s.LoginUB(c.Context(), &req)
 		if err != nil {
 			return err
 		}
