@@ -16,5 +16,5 @@ var (
 
 	ErrInvalidToken = response.NewError(http.StatusUnauthorized).
 			WithRefCode("INVALID_TOKEN").
-			WithMessage("Ada yang salah dengan autentikasi akun kamu. Silakan log in ulang.")
+			WithMessage("Silakan log in ulang.")
 )
