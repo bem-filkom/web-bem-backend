@@ -9,6 +9,10 @@ var (
 		INSERT INTO users (id, email, full_name) VALUES ($1, $2, $3)
 	`
 
+	getUserByIDQuery = `
+		SELECT id, email, full_name FROM users WHERE id = $1
+	`
+
 	updateUserQuery = `
 		UPDATE users SET %s WHERE id = $%d
 	`
@@ -20,6 +24,10 @@ var (
 	createStudentQuery = `
 		INSERT INTO students (nim, program_studi, fakultas)
 		VALUES ($1, $2, $3)
+	`
+
+	getStudentByNIMQuery = `
+		SELECT nim, program_studi, fakultas FROM students WHERE nim = $1
 	`
 
 	updateStudentQuery = `
@@ -47,7 +55,7 @@ var (
 	`
 
 	getBemMemberByNIMQuery = `
-		SELECT b.nim, b.kemenbiro_id, b.position, b.period, k.abbreviation 
+		SELECT b.nim, b.kemenbiro_id, b.position, b.period, k.abbreviation, k.name 
 		FROM bem_members b 
 		    JOIN kemenbiros k ON b.kemenbiro_id = k.id 
 		WHERE b.nim = $1

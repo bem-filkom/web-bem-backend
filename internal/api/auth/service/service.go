@@ -13,7 +13,7 @@ type authService struct {
 }
 
 type IAuthService interface {
-	LoginAuthUb(ctx context.Context, req *auth.LoginRequest) (string, error)
+	LoginAuthUb(ctx context.Context, req *auth.LoginRequest) (*auth.LoginResponse, error)
 }
 
 func NewAuthService(us service.IUserService, ubAuth ubauth.IUBAuth) IAuthService {

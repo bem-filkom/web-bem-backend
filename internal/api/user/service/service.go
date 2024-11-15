@@ -13,7 +13,9 @@ type userService struct {
 
 type IUserService interface {
 	SaveUser(ctx context.Context, req *user.SaveUserRequest) error
+	GetUserByNIM(ctx context.Context, req *user.GetUserRequest) (*entity.User, error)
 	SaveStudent(ctx context.Context, req *user.SaveStudentRequest) error
+	GetStudentByNIM(ctx context.Context, req *user.GetUserRequest) (*entity.Student, error)
 	CreateBemMember(ctx context.Context, req *user.CreateBemMemberRequest) error
 	GetBemMemberByNIM(ctx context.Context, req *user.GetUserRequest) (*entity.BemMember, error)
 	GetRole(ctx context.Context, req *user.GetUserRequest) (entity.UserRole, error)

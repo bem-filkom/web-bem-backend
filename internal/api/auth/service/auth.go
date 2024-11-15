@@ -13,10 +13,12 @@ import (
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/validator"
 )
 
-func (s *authService) LoginAuthUb(ctx context.Context, req *auth.LoginRequest) (string, error) {
+func (s *authService) LoginAuthUb(ctx context.Context, req *auth.LoginRequest) (*auth.LoginResponse, error) {
 	if err := validator.GetValidator().ValidateStruct(req); err != nil {
-		return "", response.ErrValidation.WithDetail(err)
+		return nil, response.ErrValidation.WithDetail(err)
 	}
+
+	var res auth.LoginResponse
 
 	studentDetails, err := s.ubAuth.AuthUB(req.Username, req.Password)
 	if err != nil {
@@ -30,14 +32,24 @@ func (s *authService) LoginAuthUb(ctx context.Context, req *auth.LoginRequest) (
 
 		switch respErr.Message {
 		case "Invalid username or password":
-			return "", auth.ErrInvalidCredentials
+			return nil, auth.ErrInvalidCredentials
 		default:
 			log.GetLogger().WithFields(map[string]interface{}{
 				"error":    respErr.Error(),
 				"username": req.Username,
 			}).Error("[AuthService][LoginAuthUb] fail to authenticate user")
-			return "", response.ErrInternalServerError
+			return nil, response.ErrInternalServerError
 		}
+	}
+
+	student := &entity.Student{
+		NIM: studentDetails.NIM,
+		User: &entity.User{
+			Email:    studentDetails.Email,
+			FullName: studentDetails.FullName,
+		},
+		ProgramStudi: studentDetails.ProgramStudi,
+		Fakultas:     studentDetails.Fakultas,
 	}
 
 	if err := s.us.SaveStudent(ctx, &user.SaveStudentRequest{
@@ -47,7 +59,7 @@ func (s *authService) LoginAuthUb(ctx context.Context, req *auth.LoginRequest) (
 		Fakultas:     studentDetails.Fakultas,
 		ProgramStudi: studentDetails.ProgramStudi,
 	}); err != nil {
-		return "", err
+		return nil, err
 	}
 
 	jwtCreateReq := &jwt.CreateRequest{
@@ -60,9 +72,10 @@ func (s *authService) LoginAuthUb(ctx context.Context, req *auth.LoginRequest) (
 			"error":           err.Error(),
 			"student_details": studentDetails,
 		}).Error("[AuthService][LoginAuthUb] fail to get role")
-		return "", response.ErrInternalServerError
+		return nil, response.ErrInternalServerError
 	}
 	jwtCreateReq.Role = role
+	res.Role = role
 
 	if role == entity.RoleBemMember {
 		bemMember, err := s.us.GetBemMemberByNIM(ctx, &user.GetUserRequest{ID: studentDetails.NIM})
@@ -71,10 +84,25 @@ func (s *authService) LoginAuthUb(ctx context.Context, req *auth.LoginRequest) (
 				"error":           err.Error(),
 				"student_details": studentDetails,
 			}).Error("[AuthService][LoginAuthUb] fail to get bem member")
-			return "", response.ErrInternalServerError
+			return nil, response.ErrInternalServerError
 		}
 		jwtCreateReq.KemenbiroID = bemMember.KemenbiroID
 		jwtCreateReq.KemenbiroAbbreviation = bemMember.Kemenbiro.Abbreviation
+
+		student.NIM = ""
+		res.BemMember = &entity.BemMember{
+			NIM:         studentDetails.NIM,
+			Student:     student,
+			KemenbiroID: bemMember.KemenbiroID,
+			Kemenbiro: &entity.Kemenbiro{
+				Name:         bemMember.Kemenbiro.Name,
+				Abbreviation: bemMember.Kemenbiro.Abbreviation,
+			},
+			Position: bemMember.Position,
+			Period:   bemMember.Period,
+		}
+	} else {
+		res.Student = student
 	}
 
 	accessToken, err := jwt.CreateAccessToken(jwtCreateReq)
@@ -83,7 +111,9 @@ func (s *authService) LoginAuthUb(ctx context.Context, req *auth.LoginRequest) (
 			"error":    err.Error(),
 			"username": req.Username,
 		}).Error("[AuthService][LoginAuthUb] fail to create jwt access token")
-		return "", response.ErrInternalServerError
+		return nil, response.ErrInternalServerError
 	}
-	return accessToken, nil
+	res.AccessToken = accessToken
+
+	return &res, nil
 }

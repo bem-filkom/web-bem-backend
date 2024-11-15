@@ -15,14 +15,21 @@ type Kemenbiro struct {
 
 func (k Kemenbiro) MarshalJSON() ([]byte, error) {
 	type Alias Kemenbiro
-	aux := struct {
-		Alias
-		Description *string `json:"description,omitempty"`
+	aux := &struct {
+		ID          *uuid.UUID `json:"id,omitempty"`
+		Description *string    `json:"description,omitempty"`
+		*Alias
 	}{
-		Alias: (Alias)(k),
+		Alias: (*Alias)(&k),
 	}
+
+	if k.ID != uuid.Nil {
+		aux.ID = &k.ID
+	}
+
 	if k.Description.Valid {
 		aux.Description = &k.Description.String
 	}
+
 	return json.Marshal(aux)
 }

@@ -13,13 +13,11 @@ func (h *AuthHandler) Login() fiber.Handler {
 			return response.ErrUnprocessableEntity
 		}
 
-		token, err := h.s.LoginAuthUb(c.Context(), &req)
+		res, err := h.s.LoginAuthUb(c.Context(), &req)
 		if err != nil {
 			return err
 		}
 
-		return c.Status(fiber.StatusOK).JSON(map[string]any{
-			"access_token": token,
-		})
+		return c.Status(fiber.StatusOK).JSON(res)
 	}
 }

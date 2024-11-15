@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"github.com/bem-filkom/web-bem-backend/internal/api/user"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/entity"
@@ -35,6 +36,29 @@ func (s *userService) SaveUser(ctx context.Context, req *user.SaveUserRequest) e
 	return nil
 }
 
+func (s *userService) GetUserByNIM(ctx context.Context, req *user.GetUserRequest) (*entity.User, error) {
+	if valErr := validator.GetValidator().ValidateStruct(req); valErr != nil {
+		log.GetLogger().WithFields(map[string]interface{}{
+			"error":   valErr.Error(),
+			"request": req,
+		}).Error("[UserService][GetUserByNIM] validation error")
+		return nil, response.ErrValidation.WithDetail(valErr)
+	}
+
+	userObj, err := s.r.GetUserByID(ctx, req.ID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, response.ErrNotFound
+		}
+		log.GetLogger().WithFields(map[string]interface{}{
+			"error":   err.Error(),
+			"request": req,
+		}).Error("[UserService][GetUserByNIM] fail to get user from database")
+		return nil, response.ErrInternalServerError
+	}
+	return userObj, nil
+}
+
 func (s *userService) SaveStudent(ctx context.Context, req *user.SaveStudentRequest) error {
 	if valErr := validator.GetValidator().ValidateStruct(req); valErr != nil {
 		log.GetLogger().WithFields(map[string]interface{}{
@@ -66,6 +90,29 @@ func (s *userService) SaveStudent(ctx context.Context, req *user.SaveStudentRequ
 		return response.ErrInternalServerError
 	}
 	return nil
+}
+
+func (s *userService) GetStudentByNIM(ctx context.Context, req *user.GetUserRequest) (*entity.Student, error) {
+	if valErr := validator.GetValidator().ValidateStruct(req); valErr != nil {
+		log.GetLogger().WithFields(map[string]interface{}{
+			"error":   valErr.Error(),
+			"request": req,
+		}).Error("[UserService][GetStudentByNIM] validation error")
+		return nil, response.ErrValidation.WithDetail(valErr)
+	}
+
+	student, err := s.r.GetStudentByNIM(ctx, req.ID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, response.ErrNotFound
+		}
+		log.GetLogger().WithFields(map[string]interface{}{
+			"error":   err.Error(),
+			"request": req,
+		}).Error("[UserService][GetStudentByNIM] fail to get student from database")
+		return nil, response.ErrInternalServerError
+	}
+	return student, nil
 }
 
 func (s *userService) CreateBemMember(ctx context.Context, req *user.CreateBemMemberRequest) error {

@@ -23,6 +23,19 @@ func (r *userRepository) createUser(ctx context.Context, tx sqlx.ExtContext, use
 	return err
 }
 
+func (r *userRepository) getUserByID(ctx context.Context, tx sqlx.ExtContext, id string) (*entity.User, error) {
+	var user entity.User
+	if err := tx.QueryRowxContext(ctx, getUserByIDQuery, id).StructScan(&user); err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (r *userRepository) GetUserByID(ctx context.Context, id string) (*entity.User, error) {
+	return r.getUserByID(ctx, r.db, id)
+}
+
 func (r *userRepository) updateUser(ctx context.Context, tx sqlx.ExtContext, user *entity.User) error {
 	var queryParts []string
 	var args []any
@@ -98,6 +111,19 @@ func (r *userRepository) checkStudentExistence(ctx context.Context, tx sqlx.ExtC
 func (r *userRepository) createStudent(ctx context.Context, tx sqlx.ExtContext, student *entity.Student) error {
 	_, err := tx.ExecContext(ctx, createStudentQuery, student.NIM, student.ProgramStudi, student.Fakultas)
 	return err
+}
+
+func (r *userRepository) getStudentByNIM(ctx context.Context, tx sqlx.ExtContext, nim string) (*entity.Student, error) {
+	var student entity.Student
+	if err := tx.QueryRowxContext(ctx, getStudentByNIMQuery, nim).StructScan(&student); err != nil {
+		return nil, err
+	}
+
+	return &student, nil
+}
+
+func (r *userRepository) GetStudentByNIM(ctx context.Context, nim string) (*entity.Student, error) {
+	return r.getStudentByNIM(ctx, r.db, nim)
 }
 
 func (r *userRepository) updateStudent(ctx context.Context, tx sqlx.ExtContext, student *entity.Student) error {
@@ -217,6 +243,7 @@ func (r *userRepository) getBemMemberByNIM(ctx context.Context, tx sqlx.ExtConte
 		Position     string
 		Period       int
 		Abbreviation string
+		Name         string
 	}
 
 	if err := tx.QueryRowxContext(ctx, getBemMemberByNIMQuery, nim).StructScan(&bemMember); err != nil {
@@ -226,9 +253,12 @@ func (r *userRepository) getBemMemberByNIM(ctx context.Context, tx sqlx.ExtConte
 	return &entity.BemMember{
 		NIM:         bemMember.NIM,
 		KemenbiroID: bemMember.KemenbiroID,
-		Kemenbiro:   &entity.Kemenbiro{Abbreviation: bemMember.Abbreviation},
-		Position:    bemMember.Position,
-		Period:      bemMember.Period,
+		Kemenbiro: &entity.Kemenbiro{
+			Abbreviation: bemMember.Abbreviation,
+			Name:         bemMember.Name,
+		},
+		Position: bemMember.Position,
+		Period:   bemMember.Period,
 	}, nil
 }
 
