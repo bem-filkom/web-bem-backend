@@ -57,7 +57,14 @@ func createValidator() {
 	if err != nil {
 		log.GetLogger().WithFields(map[string]any{
 			"error": err.Error(),
-		}).Error("[VALIDATOR][NewValidator] Failed to register default translations")
+		}).Fatalln("[VALIDATOR][NewValidator] Failed to register default translations")
+		return
+	}
+
+	if err := registerCustomValidations(val, translator); err != nil {
+		log.GetLogger().WithFields(map[string]any{
+			"error": err.Error(),
+		}).Fatalln("[VALIDATOR][NewValidator] Failed to register custom validations")
 		return
 	}
 
@@ -65,6 +72,14 @@ func createValidator() {
 		validator:  val,
 		translator: translator,
 	}
+}
+
+func registerCustomValidations(val *validator.Validate, trans ut.Translator) error {
+	if err := registerSlugValidation(val, trans); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func GetValidator() *ValidatorStruct {
