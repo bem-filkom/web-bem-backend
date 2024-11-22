@@ -13,6 +13,7 @@ type programKerjaRepository struct {
 
 type IProgramKerjaRepository interface {
 	CreateProgramKerja(ctx context.Context, programKerja *entity.ProgramKerja) (uuid.UUID, error)
+	GetProgramKerjasByKemenbiroID(ctx context.Context, kemenbiroID uuid.UUID) ([]*entity.ProgramKerja, error)
 }
 
 func NewProgramKerjaRepository(db *sqlx.DB) IProgramKerjaRepository {

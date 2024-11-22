@@ -23,3 +23,21 @@ func (h *ProgramKerjaHandler) CreateProgramKerja() fiber.Handler {
 		})
 	}
 }
+
+func (h *ProgramKerjaHandler) GetProgramKerjasByKemenbiroID() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var req programkerja.GetProgramKerjasByKemenbiroIDRequest
+		if err := c.QueryParser(&req); err != nil {
+			return response.ErrUnprocessableEntity
+		}
+
+		programKerjas, err := h.s.GetProgramKerjasByKemenbiroID(c.Context(), &req)
+		if err != nil {
+			return err
+		}
+
+		return c.JSON(map[string]interface{}{
+			"program_kerjas": programKerjas,
+		})
+	}
+}

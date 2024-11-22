@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"encoding/json"
 	"github.com/google/uuid"
 	"time"
 )
@@ -36,4 +37,20 @@ type BemMember struct {
 	Kemenbiro   *Kemenbiro `json:"kemenbiro,omitempty"`
 	Position    string     `json:"position,omitempty"`
 	Period      int        `json:"period,omitempty"`
+}
+
+func (k BemMember) MarshalJSON() ([]byte, error) {
+	type Alias BemMember
+	aux := &struct {
+		KemenbiroID *uuid.UUID `json:"kemenbiro_id,omitempty"`
+		*Alias
+	}{
+		Alias: (*Alias)(&k),
+	}
+
+	if k.KemenbiroID != uuid.Nil {
+		aux.KemenbiroID = &k.KemenbiroID
+	}
+
+	return json.Marshal(aux)
 }

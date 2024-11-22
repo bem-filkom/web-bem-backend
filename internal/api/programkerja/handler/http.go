@@ -22,4 +22,6 @@ func (h *ProgramKerjaHandler) Start(router fiber.Router) {
 		middleware.RequireRole(entity.RoleBemMember),
 		h.CreateProgramKerja(),
 	)
+	
+	router.Get("", h.GetProgramKerjasByKemenbiroID())
 }

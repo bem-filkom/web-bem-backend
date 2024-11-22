@@ -12,3 +12,7 @@ type CreateProgramKerjaRequest struct {
 	Description      string              `json:"description" validate:"omitempty,max=2000"`
 	PenanggungJawabs []*entity.BemMember `json:"penanggung_jawabs" validate:"required"`
 }
+
+type GetProgramKerjasByKemenbiroIDRequest struct {
+	KemenbiroID uuid.UUID `query:"kemenbiro_id" validate:"required,uuid"`
+}

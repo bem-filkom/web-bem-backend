@@ -13,6 +13,7 @@ type programKerjaService struct {
 
 type IProgramKerjaService interface {
 	CreateProgramKerja(ctx context.Context, req *programkerja.CreateProgramKerjaRequest) (*entity.ProgramKerja, error)
+	GetProgramKerjasByKemenbiroID(ctx context.Context, req *programkerja.GetProgramKerjasByKemenbiroIDRequest) ([]*entity.ProgramKerja, error)
 }
 
 func NewProgramKerjaService(r repository.IProgramKerjaRepository) IProgramKerjaService {

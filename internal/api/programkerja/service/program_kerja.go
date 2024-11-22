@@ -23,11 +23,11 @@ func (s *programKerjaService) CreateProgramKerja(ctx context.Context, req *progr
 	}
 
 	programKerjaObj := &entity.ProgramKerja{
-		Slug:            req.Slug,
-		Name:            req.Name,
-		KemenbiroID:     req.KemenbiroID,
-		Description:     sql.NullString{String: req.Description, Valid: req.Description != ""},
-		PenanggungJawab: req.PenanggungJawabs,
+		Slug:             req.Slug,
+		Name:             req.Name,
+		KemenbiroID:      req.KemenbiroID,
+		Description:      sql.NullString{String: req.Description, Valid: req.Description != ""},
+		PenanggungJawabs: req.PenanggungJawabs,
 	}
 
 	id, err := s.r.CreateProgramKerja(ctx, programKerjaObj)
@@ -52,4 +52,21 @@ func (s *programKerjaService) CreateProgramKerja(ctx context.Context, req *progr
 	}
 
 	return &entity.ProgramKerja{ID: id}, nil
+}
+
+func (s *programKerjaService) GetProgramKerjasByKemenbiroID(ctx context.Context, req *programkerja.GetProgramKerjasByKemenbiroIDRequest) ([]*entity.ProgramKerja, error) {
+	if err := validator.GetValidator().ValidateStruct(req); err != nil {
+		return nil, response.ErrValidation.WithDetail(err)
+	}
+
+	programKerjas, err := s.r.GetProgramKerjasByKemenbiroID(ctx, req.KemenbiroID)
+	if err != nil {
+		log.GetLogger().WithFields(map[string]interface{}{
+			"error":        err,
+			"kemenbiro_id": req.KemenbiroID,
+		}).Errorln("[ProgramKerjaService][GetProgramKerjasByKemenbiroID] fail to get program kerjas by kemenbiro id")
+		return nil, response.ErrInternalServerError
+	}
+
+	return programKerjas, nil
 }
