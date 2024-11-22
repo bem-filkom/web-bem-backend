@@ -8,12 +8,16 @@ import (
 	kemenbiroHnd "github.com/bem-filkom/web-bem-backend/internal/api/kemenbiro/handler"
 	kemenbiroRepo "github.com/bem-filkom/web-bem-backend/internal/api/kemenbiro/repository"
 	kemenbiroSvc "github.com/bem-filkom/web-bem-backend/internal/api/kemenbiro/service"
+	prokerHnd "github.com/bem-filkom/web-bem-backend/internal/api/programkerja/handler"
+	prokerRepo "github.com/bem-filkom/web-bem-backend/internal/api/programkerja/repository"
+	prokerSvc "github.com/bem-filkom/web-bem-backend/internal/api/programkerja/service"
 	userHnd "github.com/bem-filkom/web-bem-backend/internal/api/user/handler"
 	userRepo "github.com/bem-filkom/web-bem-backend/internal/api/user/repository"
 	userSvc "github.com/bem-filkom/web-bem-backend/internal/api/user/service"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/env"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/log"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/ubauth"
+	"github.com/bem-filkom/web-bem-backend/internal/pkg/validator"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/jmoiron/sqlx"
@@ -30,6 +34,7 @@ type ihandler interface {
 }
 
 func NewServer(engine *fiber.App) *Server {
+	validator.GetValidator()
 	return &Server{
 		engine: engine,
 		db:     postgresql.NewConnection(),
@@ -49,8 +54,12 @@ func (s *Server) RegisterHandlers() {
 	authService := service.NewAuthService(userService, ubAuth)
 	authHandler := authHnd.NewAuthHandler(authService)
 
+	programKerjaRepository := prokerRepo.NewProgramKerjaRepository(s.db)
+	programKerjaService := prokerSvc.NewProgramKerjaService(programKerjaRepository)
+	programKerjaHandler := prokerHnd.NewProgramKerjaHandler(programKerjaService)
+
 	s.healthCheck()
-	s.handlers = append(s.handlers, kemenbiroHandler, userHandler, authHandler)
+	s.handlers = append(s.handlers, kemenbiroHandler, userHandler, authHandler, programKerjaHandler)
 }
 
 func (s *Server) Run() {

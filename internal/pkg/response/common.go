@@ -38,4 +38,8 @@ var (
 	ErrForbiddenSuperAdmin = NewError(http.StatusForbidden).
 				WithRefCode("FORBIDDEN_SUPER_ADMIN").
 				WithMessage("Silakan hubungi PIT untuk melakukan ini.")
+
+	ErrConflictSlug = NewError(http.StatusConflict).
+			WithRefCode("CONFLICT_SLUG").
+			WithMessage("Slug sudah digunakan. Silakan gunakan yang lain.")
 )
