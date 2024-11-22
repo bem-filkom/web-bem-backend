@@ -13,6 +13,7 @@ type programKerjaRepository struct {
 
 type IProgramKerjaRepository interface {
 	CreateProgramKerja(ctx context.Context, programKerja *entity.ProgramKerja) (uuid.UUID, error)
+	GetProgramKerjaByID(ctx context.Context, id uuid.UUID) (*entity.ProgramKerja, error)
 	GetProgramKerjasByKemenbiroID(ctx context.Context, kemenbiroID uuid.UUID) ([]*entity.ProgramKerja, error)
 }
 

@@ -54,6 +54,27 @@ func (s *programKerjaService) CreateProgramKerja(ctx context.Context, req *progr
 	return &entity.ProgramKerja{ID: id}, nil
 }
 
+func (s *programKerjaService) GetProgramKerjaByID(ctx context.Context, req *programkerja.GetProgramKerjaByIDRequest) (*entity.ProgramKerja, error) {
+	if err := validator.GetValidator().ValidateStruct(req); err != nil {
+		return nil, response.ErrValidation.WithDetail(err)
+	}
+
+	programKerjaObj, err := s.r.GetProgramKerjaByID(ctx, req.ID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, response.ErrNotFound.WithMessage("Program kerja tidak ditemukan")
+		}
+
+		log.GetLogger().WithFields(map[string]interface{}{
+			"error": err,
+			"id":    req.ID,
+		}).Errorln("[ProgramKerjaService][GetProgramKerjaByID] fail to get program kerja by id")
+		return nil, response.ErrInternalServerError
+	}
+
+	return programKerjaObj, nil
+}
+
 func (s *programKerjaService) GetProgramKerjasByKemenbiroID(ctx context.Context, req *programkerja.GetProgramKerjasByKemenbiroIDRequest) ([]*entity.ProgramKerja, error) {
 	if err := validator.GetValidator().ValidateStruct(req); err != nil {
 		return nil, response.ErrValidation.WithDetail(err)

@@ -24,6 +24,24 @@ func (h *ProgramKerjaHandler) CreateProgramKerja() fiber.Handler {
 	}
 }
 
+func (h *ProgramKerjaHandler) GetProgramKerjaByID() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var req programkerja.GetProgramKerjaByIDRequest
+		if err := c.ParamsParser(&req); err != nil {
+			return response.ErrUnprocessableEntity
+		}
+
+		programKerja, err := h.s.GetProgramKerjaByID(c.Context(), &req)
+		if err != nil {
+			return err
+		}
+
+		return c.JSON(map[string]interface{}{
+			"program_kerja": programKerja,
+		})
+	}
+}
+
 func (h *ProgramKerjaHandler) GetProgramKerjasByKemenbiroID() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req programkerja.GetProgramKerjasByKemenbiroIDRequest

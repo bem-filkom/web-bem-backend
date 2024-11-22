@@ -13,6 +13,7 @@ type programKerjaService struct {
 
 type IProgramKerjaService interface {
 	CreateProgramKerja(ctx context.Context, req *programkerja.CreateProgramKerjaRequest) (*entity.ProgramKerja, error)
+	GetProgramKerjaByID(ctx context.Context, req *programkerja.GetProgramKerjaByIDRequest) (*entity.ProgramKerja, error)
 	GetProgramKerjasByKemenbiroID(ctx context.Context, req *programkerja.GetProgramKerjasByKemenbiroIDRequest) ([]*entity.ProgramKerja, error)
 }
 
