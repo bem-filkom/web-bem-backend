@@ -8,6 +8,8 @@ CREATE TABLE kabar_prokers
     updated_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX kabar_prokers_created_at_idx ON kabar_prokers (created_at);
+
 CREATE TRIGGER update_kabar_prokers_updated_at
     BEFORE UPDATE
     ON kabar_prokers

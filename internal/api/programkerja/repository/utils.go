@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func getProgramKerjasFromRow(rows []*programkerja.Row) []*entity.ProgramKerja {
+func getProgramKerjasFromRow(rows []*programkerja.GetProgramKerjaQueryRow) []*entity.ProgramKerja {
 	programKerjasMap := make(map[uuid.UUID]*entity.ProgramKerja)
 
 	for _, row := range rows {

@@ -15,7 +15,7 @@ import (
 
 func (s *kabarProkerService) CreateKabarProker(ctx context.Context, req *proker.CreateKabarProkerRequest) error {
 	if err := validator.GetValidator().ValidateStruct(req); err != nil {
-		return response.ErrUnprocessableEntity.WithDetail(err)
+		return response.ErrValidation.WithDetail(err)
 	}
 
 	kemenbiroID, err := s.pkr.GetKemenbiroIDByProgramKerjaID(ctx, req.ProgramKerjaID)
@@ -57,7 +57,25 @@ func (s *kabarProkerService) CreateKabarProker(ctx context.Context, req *proker.
 			"error":   err,
 			"request": req,
 		}).Errorln("[KabarProkerService][CreateKabarProker] fail to create kabar proker")
+		return response.ErrInternalServerError
 	}
 
-	return err
+	return nil
+}
+
+func (s *kabarProkerService) GetKabarProkerByQuery(ctx context.Context, req *proker.GetKabarProkerByQueryRequest) ([]*entity.KabarProker, error) {
+	if err := validator.GetValidator().ValidateStruct(req); err != nil {
+		return nil, response.ErrValidation.WithDetail(err)
+	}
+
+	kabarProkers, err := s.r.GetKabarProkerByQuery(ctx, req)
+	if err != nil {
+		log.GetLogger().WithFields(map[string]any{
+			"error":   err,
+			"request": req,
+		}).Errorln("[KabarProkerService][GetKabarProkerByQuery] fail to get kabar proker by query")
+		return nil, response.ErrInternalServerError
+	}
+
+	return kabarProkers, nil
 }

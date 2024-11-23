@@ -22,7 +22,7 @@ type GetProgramKerjaByIDRequest struct {
 	ID uuid.UUID `param:"id" validate:"required,uuid"`
 }
 
-type Row struct {
+type GetProgramKerjaQueryRow struct {
 	ProkerID              uuid.UUID      `db:"proker_id"`
 	ProkerSlug            string         `db:"proker_slug"`
 	ProkerName            string         `db:"proker_name"`

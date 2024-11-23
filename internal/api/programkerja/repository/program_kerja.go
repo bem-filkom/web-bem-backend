@@ -62,7 +62,7 @@ func (r *programKerjaRepository) CreateProgramKerja(ctx context.Context, program
 }
 
 func (r *programKerjaRepository) getProgramKerjaByID(ctx context.Context, tx sqlx.ExtContext, id uuid.UUID) (*entity.ProgramKerja, error) {
-	var rows []*programkerja.Row
+	var rows []*programkerja.GetProgramKerjaQueryRow
 	if err := sqlx.SelectContext(ctx, tx, &rows, getProgramKerjaByIDQuery, id); err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (r *programKerjaRepository) GetProgramKerjaByID(ctx context.Context, id uui
 }
 
 func (r *programKerjaRepository) getProgramKerjasByKemenbiroID(ctx context.Context, tx sqlx.ExtContext, kemenbiroID uuid.UUID) ([]*entity.ProgramKerja, error) {
-	var rows []*programkerja.Row
+	var rows []*programkerja.GetProgramKerjaQueryRow
 	if err := sqlx.SelectContext(ctx, tx, &rows, getProgramKerjasByKemenbiroIDQuery, kemenbiroID); err != nil {
 		return nil, err
 	}

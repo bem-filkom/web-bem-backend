@@ -2,6 +2,7 @@ package entity
 
 import (
 	"database/sql"
+	"encoding/json"
 	"github.com/google/uuid"
 	"time"
 )
@@ -22,4 +23,25 @@ type KabarProkerImage struct {
 	KabarProker   *KabarProker   `json:"kabar_proker,omitempty"`
 	URL           string         `json:"url,omitempty"`
 	Description   sql.NullString `json:"description,omitempty"`
+}
+
+func (k KabarProker) MarshalJSON() ([]byte, error) {
+	type Alias KabarProker
+	aux := &struct {
+		ProgramKerjaID *uuid.UUID `json:"program_kerja_id,omitempty"`
+		UpdatedAt      *time.Time `json:"updated_at,omitempty"`
+		*Alias
+	}{
+		Alias: (*Alias)(&k),
+	}
+
+	if k.ProgramKerjaID != uuid.Nil {
+		aux.ProgramKerjaID = &k.ProgramKerjaID
+	}
+
+	if !k.UpdatedAt.IsZero() {
+		aux.UpdatedAt = &k.UpdatedAt
+	}
+
+	return json.Marshal(aux)
 }

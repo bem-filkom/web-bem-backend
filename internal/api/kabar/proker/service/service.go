@@ -5,6 +5,7 @@ import (
 	"github.com/bem-filkom/web-bem-backend/internal/api/kabar/proker"
 	"github.com/bem-filkom/web-bem-backend/internal/api/kabar/proker/repository"
 	prokerRepo "github.com/bem-filkom/web-bem-backend/internal/api/programkerja/repository"
+	"github.com/bem-filkom/web-bem-backend/internal/pkg/entity"
 )
 
 type kabarProkerService struct {
@@ -14,6 +15,7 @@ type kabarProkerService struct {
 
 type IKabarProkerService interface {
 	CreateKabarProker(ctx context.Context, req *proker.CreateKabarProkerRequest) error
+	GetKabarProkerByQuery(ctx context.Context, req *proker.GetKabarProkerByQueryRequest) ([]*entity.KabarProker, error)
 }
 
 func NewKabarProkerService(r repository.IKabarProkerRepository, pkr prokerRepo.IProgramKerjaRepository) IKabarProkerService {
