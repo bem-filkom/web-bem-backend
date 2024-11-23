@@ -1,6 +1,5 @@
 package jwt
 
-import "C"
 import (
 	"encoding/json"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/entity"
