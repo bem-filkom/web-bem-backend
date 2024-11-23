@@ -1,0 +1,41 @@
+services:
+  web-bem-db:
+    image: postgres:17.2
+    container_name: web-bem-db
+    env_file:
+      - .env
+    ports:
+      - "${POSTGRES_PORT}"
+    restart: always
+    volumes:
+      - web-bem-db-data:/var/lib/postgresql/data
+    environment:
+      #this ENV variable is only required for the healthcheck section
+      PGUSER: "postgres"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - web-bem-net
+
+  web-bem-backend:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    depends_on:
+      web-bem-db:
+        condition: service_healthy
+    networks:
+      - web-bem-net
+
+networks:
+  web-bem-net:
+    driver: bridge
+
+volumes:
+  web-bem-db-data:
+    driver: local
