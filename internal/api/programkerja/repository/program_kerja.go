@@ -91,3 +91,16 @@ func (r *programKerjaRepository) getProgramKerjasByKemenbiroID(ctx context.Conte
 func (r *programKerjaRepository) GetProgramKerjasByKemenbiroID(ctx context.Context, kemenbiroID uuid.UUID) ([]*entity.ProgramKerja, error) {
 	return r.getProgramKerjasByKemenbiroID(ctx, r.db, kemenbiroID)
 }
+
+func (r *programKerjaRepository) getKemenbiroIDByProgramKerjaID(ctx context.Context, tx sqlx.ExtContext, programKerjaID uuid.UUID) (uuid.UUID, error) {
+	var kemenbiroID uuid.UUID
+	if err := tx.QueryRowxContext(ctx, getKemenbiroIDByProgramKerjaIDQuery, programKerjaID).Scan(&kemenbiroID); err != nil {
+		return uuid.Nil, err
+	}
+
+	return kemenbiroID, nil
+}
+
+func (r *programKerjaRepository) GetKemenbiroIDByProgramKerjaID(ctx context.Context, prokerID uuid.UUID) (uuid.UUID, error) {
+	return r.getKemenbiroIDByProgramKerjaID(ctx, r.db, prokerID)
+}

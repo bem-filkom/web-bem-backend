@@ -5,6 +5,9 @@ import (
 	"github.com/bem-filkom/web-bem-backend/database/postgresql"
 	authHnd "github.com/bem-filkom/web-bem-backend/internal/api/auth/handler"
 	"github.com/bem-filkom/web-bem-backend/internal/api/auth/service"
+	kabarProkerHnd "github.com/bem-filkom/web-bem-backend/internal/api/kabar/proker/handler"
+	kabarProkerRepo "github.com/bem-filkom/web-bem-backend/internal/api/kabar/proker/repository"
+	kabarProkerSvc "github.com/bem-filkom/web-bem-backend/internal/api/kabar/proker/service"
 	kemenbiroHnd "github.com/bem-filkom/web-bem-backend/internal/api/kemenbiro/handler"
 	kemenbiroRepo "github.com/bem-filkom/web-bem-backend/internal/api/kemenbiro/repository"
 	kemenbiroSvc "github.com/bem-filkom/web-bem-backend/internal/api/kemenbiro/service"
@@ -58,8 +61,18 @@ func (s *Server) RegisterHandlers() {
 	programKerjaService := prokerSvc.NewProgramKerjaService(programKerjaRepository)
 	programKerjaHandler := prokerHnd.NewProgramKerjaHandler(programKerjaService)
 
+	kabarProkerRepository := kabarProkerRepo.NewKabarProkerRepository(s.db)
+	kabarProkerService := kabarProkerSvc.NewKabarProkerService(kabarProkerRepository, programKerjaRepository)
+	kabarProkerHandler := kabarProkerHnd.NewKabarProkerHandler(kabarProkerService)
+
 	s.healthCheck()
-	s.handlers = append(s.handlers, kemenbiroHandler, userHandler, authHandler, programKerjaHandler)
+	s.handlers = append(s.handlers,
+		kemenbiroHandler,
+		userHandler,
+		authHandler,
+		programKerjaHandler,
+		kabarProkerHandler,
+	)
 }
 
 func (s *Server) Run() {

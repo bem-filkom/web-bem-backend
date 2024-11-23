@@ -60,4 +60,8 @@ var (
 		WHERE
     		pk.kemenbiro_id = $1
 	`
+
+	getKemenbiroIDByProgramKerjaIDQuery = `
+		SELECT kemenbiro_id FROM program_kerjas WHERE id = $1
+	`
 )

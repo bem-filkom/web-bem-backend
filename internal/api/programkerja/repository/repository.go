@@ -15,6 +15,7 @@ type IProgramKerjaRepository interface {
 	CreateProgramKerja(ctx context.Context, programKerja *entity.ProgramKerja) (uuid.UUID, error)
 	GetProgramKerjaByID(ctx context.Context, id uuid.UUID) (*entity.ProgramKerja, error)
 	GetProgramKerjasByKemenbiroID(ctx context.Context, kemenbiroID uuid.UUID) ([]*entity.ProgramKerja, error)
+	GetKemenbiroIDByProgramKerjaID(ctx context.Context, prokerID uuid.UUID) (uuid.UUID, error)
 }
 
 func NewProgramKerjaRepository(db *sqlx.DB) IProgramKerjaRepository {

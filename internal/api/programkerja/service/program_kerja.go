@@ -10,6 +10,7 @@ import (
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/response"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/utils"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/validator"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
@@ -90,4 +91,25 @@ func (s *programKerjaService) GetProgramKerjasByKemenbiroID(ctx context.Context,
 	}
 
 	return programKerjas, nil
+}
+
+func (s *programKerjaService) GetKemenbiroIDByProgramKerjaID(ctx context.Context, prokerID uuid.UUID) (uuid.UUID, error) {
+	if err := validator.GetValidator().ValidateVariable(prokerID, "required,uuid"); err != nil {
+		return uuid.Nil, response.ErrValidation.WithDetail(err)
+	}
+
+	kemenbiroID, err := s.r.GetKemenbiroIDByProgramKerjaID(ctx, prokerID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return uuid.Nil, response.ErrNotFound.WithMessage("Program kerja tidak ditemukan")
+		}
+
+		log.GetLogger().WithFields(map[string]interface{}{
+			"error": err,
+			"id":    prokerID,
+		}).Errorln("[ProgramKerjaService][GetKemenbiroIDByProgramKerjaID] fail to get kemenbiro id by program kerja id")
+		return uuid.Nil, response.ErrInternalServerError
+	}
+
+	return kemenbiroID, nil
 }
