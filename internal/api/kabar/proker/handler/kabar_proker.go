@@ -29,13 +29,14 @@ func (h *KabarProkerHandler) GetKabarProkerByQuery() fiber.Handler {
 			return response.ErrUnprocessableEntity
 		}
 
-		kabarProkers, err := h.s.GetKabarProkerByQuery(c.Context(), &req)
+		kabarProkers, paginationRes, err := h.s.GetKabarProkerByQuery(c.Context(), &req)
 		if err != nil {
 			return err
 		}
 
 		return c.JSON(map[string]interface{}{
 			"kabar_prokers": kabarProkers,
+			"pagination":    paginationRes,
 		})
 	}
 }

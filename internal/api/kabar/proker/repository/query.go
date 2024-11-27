@@ -24,5 +24,18 @@ var (
 		WHERE %s
 		ORDER BY kp.created_at DESC
 		LIMIT $%d
+		OFFSET $%d
+	`
+
+	getKabarProkerCountQuery = `
+		SELECT 
+    		COUNT(*) AS total_count
+		FROM
+			kabar_prokers kp
+		INNER JOIN
+    		program_kerjas pk ON kp.program_kerja_id = pk.id
+		INNER JOIN 
+    		kemenbiros k ON pk.kemenbiro_id = k.id
+		WHERE %s
 	`
 )

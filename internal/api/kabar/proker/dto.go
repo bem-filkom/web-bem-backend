@@ -20,8 +20,8 @@ type GetKabarProkerByIDRequest struct {
 type GetKabarProkerByQueryRequest struct {
 	ProgramKerjaID uuid.UUID `query:"program_kerja_id" validate:"omitempty,uuid"`
 	KemenbiroID    uuid.UUID `query:"kemenbiro_id" validate:"omitempty,uuid"`
-	Before         time.Time `query:"before" validate:"omitempty"`
-	Limit          uint      `query:"limit" validate:"required,max=30"`
+	Page           uint      `query:"page" validate:"required,gt=0"`
+	Limit          uint      `query:"limit" validate:"required,max=30,gt=0"`
 }
 
 type GetKabarProkerQueryRow struct {

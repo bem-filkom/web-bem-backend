@@ -23,7 +23,8 @@ func (r *kabarProkerRepository) getKabarProkerByQuery(
 	ctx context.Context,
 	tx sqlx.ExtContext,
 	conditions *proker.GetKabarProkerByQueryRequest,
-) ([]*entity.KabarProker, error) {
+	offset uint,
+) ([]*entity.KabarProker, int64, error) {
 	var queryConditions []string
 	var queryParams []interface{}
 	paramIndex := 1 // SQLX uses 1-based indexing for parameters in PostgreSQL.
@@ -41,32 +42,33 @@ func (r *kabarProkerRepository) getKabarProkerByQuery(
 		paramIndex++
 	}
 
-	if !conditions.Before.IsZero() {
-		queryConditions = append(queryConditions, fmt.Sprintf("kp.created_at < $%d", paramIndex))
-		queryParams = append(queryParams, conditions.Before)
-		paramIndex++
-	}
-
 	// Fallback if no conditions are provided
 	whereClause := "1=1"
 	if len(queryConditions) > 0 {
 		whereClause = strings.Join(queryConditions, " AND ")
 	}
 
-	query := fmt.Sprintf(getKabarProkerQuery, whereClause, paramIndex)
+	countQuery := fmt.Sprintf(getKabarProkerCountQuery, whereClause)
+	// Execute the count query
+	var count int64
+	if err := sqlx.GetContext(ctx, tx, &count, countQuery, queryParams...); err != nil {
+		return nil, 0, err
+	}
+
+	query := fmt.Sprintf(getKabarProkerQuery, whereClause, paramIndex, paramIndex+1)
 
 	// Add limit parameter
-	queryParams = append(queryParams, conditions.Limit)
+	queryParams = append(queryParams, conditions.Limit, offset)
 
 	// Execute the query
 	var rows []*proker.GetKabarProkerQueryRow
 	if err := sqlx.SelectContext(ctx, tx, &rows, query, queryParams...); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return getKabarProkersFromRow(rows), nil
+	return getKabarProkersFromRow(rows), count, nil
 }
 
-func (r *kabarProkerRepository) GetKabarProkerByQuery(ctx context.Context, conditions *proker.GetKabarProkerByQueryRequest) ([]*entity.KabarProker, error) {
-	return r.getKabarProkerByQuery(ctx, r.db, conditions)
+func (r *kabarProkerRepository) GetKabarProkerByQuery(ctx context.Context, conditions *proker.GetKabarProkerByQueryRequest, offset uint) ([]*entity.KabarProker, int64, error) {
+	return r.getKabarProkerByQuery(ctx, r.db, conditions, offset)
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/bem-filkom/web-bem-backend/internal/api/kabar/proker"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/entity"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/log"
+	"github.com/bem-filkom/web-bem-backend/internal/pkg/pagination"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/response"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/utils"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/validator"
@@ -63,19 +64,23 @@ func (s *kabarProkerService) CreateKabarProker(ctx context.Context, req *proker.
 	return nil
 }
 
-func (s *kabarProkerService) GetKabarProkerByQuery(ctx context.Context, req *proker.GetKabarProkerByQueryRequest) ([]*entity.KabarProker, error) {
+func (s *kabarProkerService) GetKabarProkerByQuery(ctx context.Context, req *proker.GetKabarProkerByQueryRequest) ([]*entity.KabarProker, *pagination.Response, error) {
 	if err := validator.GetValidator().ValidateStruct(req); err != nil {
-		return nil, response.ErrValidation.WithDetail(err)
+		return nil, nil, response.ErrValidation.WithDetail(err)
 	}
 
-	kabarProkers, err := s.r.GetKabarProkerByQuery(ctx, req)
+	offset := (req.Page - 1) * req.Limit
+
+	kabarProkers, count, err := s.r.GetKabarProkerByQuery(ctx, req, offset)
 	if err != nil {
 		log.GetLogger().WithFields(map[string]any{
 			"error":   err,
 			"request": req,
 		}).Errorln("[KabarProkerService][GetKabarProkerByQuery] fail to get kabar proker by query")
-		return nil, response.ErrInternalServerError
+		return nil, nil, response.ErrInternalServerError
 	}
 
-	return kabarProkers, nil
+	paginationRes := pagination.NewPagination(count, req.Page, req.Limit)
+
+	return kabarProkers, paginationRes, nil
 }

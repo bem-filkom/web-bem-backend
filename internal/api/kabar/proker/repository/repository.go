@@ -15,7 +15,7 @@ type kabarProkerRepository struct {
 
 type IKabarProkerRepository interface {
 	CreateKabarProker(ctx context.Context, kabarProker *entity.KabarProker) error
-	GetKabarProkerByQuery(ctx context.Context, conditions *proker.GetKabarProkerByQueryRequest) ([]*entity.KabarProker, error)
+	GetKabarProkerByQuery(ctx context.Context, conditions *proker.GetKabarProkerByQueryRequest, offset uint) ([]*entity.KabarProker, int64, error)
 }
 
 func NewKabarProkerRepository(db *sqlx.DB) IKabarProkerRepository {
