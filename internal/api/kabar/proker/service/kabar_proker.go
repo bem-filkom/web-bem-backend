@@ -64,6 +64,27 @@ func (s *kabarProkerService) CreateKabarProker(ctx context.Context, req *proker.
 	return nil
 }
 
+func (s *kabarProkerService) GetKabarProkerByID(ctx context.Context, req proker.GetKabarProkerByIDRequest) (*entity.KabarProker, error) {
+	if err := validator.GetValidator().ValidateStruct(req); err != nil {
+		return nil, response.ErrValidation.WithDetail(err)
+	}
+
+	kabarProker, err := s.r.GetKabarProkerByID(ctx, req.ID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, response.ErrNotFound.WithMessage("Kabar proker tidak ditemukan")
+		}
+
+		log.GetLogger().WithFields(map[string]any{
+			"error":   err,
+			"request": req,
+		}).Errorln("[KabarProkerService][GetKabarProkerByID] fail to get kabar proker by ID")
+		return nil, response.ErrInternalServerError
+	}
+
+	return kabarProker, nil
+}
+
 func (s *kabarProkerService) GetKabarProkerByQuery(ctx context.Context, req *proker.GetKabarProkerByQueryRequest) ([]*entity.KabarProker, *pagination.Response, error) {
 	if err := validator.GetValidator().ValidateStruct(req); err != nil {
 		return nil, nil, response.ErrValidation.WithDetail(err)

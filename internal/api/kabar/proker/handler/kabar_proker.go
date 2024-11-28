@@ -22,6 +22,24 @@ func (h *KabarProkerHandler) CreateKabarProker() fiber.Handler {
 	}
 }
 
+func (h *KabarProkerHandler) GetKabarProkerByID() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var req proker.GetKabarProkerByIDRequest
+		if err := c.ParamsParser(&req); err != nil {
+			return response.ErrUnprocessableEntity
+		}
+
+		kabarProker, err := h.s.GetKabarProkerByID(c.Context(), req)
+		if err != nil {
+			return err
+		}
+
+		return c.JSON(map[string]interface{}{
+			"kabar_proker": kabarProker,
+		})
+	}
+}
+
 func (h *KabarProkerHandler) GetKabarProkerByQuery() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req proker.GetKabarProkerByQueryRequest

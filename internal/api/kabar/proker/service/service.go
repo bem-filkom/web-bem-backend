@@ -16,6 +16,7 @@ type kabarProkerService struct {
 
 type IKabarProkerService interface {
 	CreateKabarProker(ctx context.Context, req *proker.CreateKabarProkerRequest) error
+	GetKabarProkerByID(ctx context.Context, req proker.GetKabarProkerByIDRequest) (*entity.KabarProker, error)
 	GetKabarProkerByQuery(ctx context.Context, req *proker.GetKabarProkerByQueryRequest) ([]*entity.KabarProker, *pagination.Response, error)
 }
 

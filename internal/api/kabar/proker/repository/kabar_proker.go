@@ -19,6 +19,19 @@ func (r *kabarProkerRepository) CreateKabarProker(ctx context.Context, kabarProk
 	return r.createKabarProker(ctx, r.db, kabarProker)
 }
 
+func (r *kabarProkerRepository) getKabarProkerByID(ctx context.Context, tx sqlx.ExtContext, id string) (*entity.KabarProker, error) {
+	var row proker.GetKabarProkerQueryRow
+	if err := tx.QueryRowxContext(ctx, getKabarProkerByIDQuery, id).StructScan(&row); err != nil {
+		return nil, err
+	}
+
+	return getKabarProkerFromRow(&row), nil
+}
+
+func (r *kabarProkerRepository) GetKabarProkerByID(ctx context.Context, id string) (*entity.KabarProker, error) {
+	return r.getKabarProkerByID(ctx, r.db, id)
+}
+
 func (r *kabarProkerRepository) getKabarProkerByQuery(
 	ctx context.Context,
 	tx sqlx.ExtContext,
@@ -66,7 +79,7 @@ func (r *kabarProkerRepository) getKabarProkerByQuery(
 		return nil, 0, err
 	}
 
-	return getKabarProkersFromRow(rows), count, nil
+	return getKabarProkersFromRows(rows), count, nil
 }
 
 func (r *kabarProkerRepository) GetKabarProkerByQuery(ctx context.Context, conditions *proker.GetKabarProkerByQueryRequest, offset uint) ([]*entity.KabarProker, int64, error) {

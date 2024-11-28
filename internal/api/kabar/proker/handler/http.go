@@ -22,5 +22,6 @@ func (h *KabarProkerHandler) Start(router fiber.Router) {
 		middleware.RequireRole(entity.RoleBemMember),
 		h.CreateKabarProker(),
 	)
+	router.Get("/:id", h.GetKabarProkerByID())
 	router.Get("", h.GetKabarProkerByQuery())
 }
