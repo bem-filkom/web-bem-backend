@@ -49,12 +49,16 @@ func GenerateUpdateQueryPart(dto any) (string, []any, int, error) {
 			dbTag = strings.ToLower(fieldName)
 		}
 
-		// Handle different types of fields
-		if fieldValue.Kind() == reflect.Ptr || fieldValue.Kind() == reflect.Array {
+		switch fieldValue.Kind() {
+		case reflect.Ptr:
 			if fieldValue.IsNil() {
 				continue
 			}
-		} else {
+		case reflect.Slice, reflect.Map, reflect.Interface, reflect.Chan:
+			if fieldValue.IsNil() {
+				continue
+			}
+		default:
 			switch fieldType.Type {
 			case reflect.TypeOf(uuid.UUID{}):
 				if fieldValue.Interface() == uuid.Nil {

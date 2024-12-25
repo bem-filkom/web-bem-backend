@@ -114,7 +114,7 @@ func (r *programKerjaRepository) updatePenanggungJawabs(ctx context.Context, tx 
 		return err
 	}
 
-	if err := r.createPenanggungJawabs(ctx, tx, updates.PenanggungJawabs, updates.ID); err != nil {
+	if err := r.createPenanggungJawabs(ctx, tx, *updates.PenanggungJawabs, updates.ID); err != nil {
 		return err
 	}
 
