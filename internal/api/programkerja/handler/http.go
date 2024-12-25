@@ -24,4 +24,9 @@ func (h *ProgramKerjaHandler) Start(router fiber.Router) {
 	)
 	router.Get("/:id", h.GetProgramKerjaByID())
 	router.Get("", h.GetProgramKerjasByKemenbiroID())
+	router.Patch("/:id",
+		middleware.Authenticate(),
+		middleware.RequireRole(entity.RoleBemMember),
+		h.UpdateProgramKerja(),
+	)
 }

@@ -34,3 +34,12 @@ type GetProgramKerjaQueryRow struct {
 	PjProdi               sql.NullString `db:"pj_prodi"`
 	PjFullName            sql.NullString `db:"pj_full_name"`
 }
+
+type UpdateProgramKerjaRequest struct {
+	ID               uuid.UUID           `param:"id" validate:"required,uuid" db:"-"`
+	Slug             *string             `json:"slug" validate:"omitempty,max=255,slug"`
+	Name             *string             `json:"name" validate:"omitempty,max=255"`
+	KemenbiroID      uuid.UUID           `json:"kemenbiro_id" validate:"omitempty,uuid" db:"kemenbiro_id"`
+	Description      *string             `json:"description" validate:"omitempty,max=2000"`
+	PenanggungJawabs []*entity.BemMember `json:"penanggung_jawabs" validate:"omitempty" db:"-"`
+}

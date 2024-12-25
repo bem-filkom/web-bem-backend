@@ -113,3 +113,41 @@ func (s *programKerjaService) GetKemenbiroIDByProgramKerjaID(ctx context.Context
 
 	return kemenbiroID, nil
 }
+
+func (s *programKerjaService) UpdateProgramKerja(ctx context.Context, req *programkerja.UpdateProgramKerjaRequest) error {
+	if err := validator.GetValidator().ValidateStruct(req); err != nil {
+		return response.ErrValidation.WithDetail(err)
+	}
+
+	kemenbiroID, err := s.GetKemenbiroIDByProgramKerjaID(ctx, req.ID)
+	if err != nil {
+		return err
+	}
+
+	if err := utils.RequireKemenbiroID(ctx, kemenbiroID); err != nil {
+		return err
+	}
+
+	if req.KemenbiroID != uuid.Nil {
+		if err := utils.RequireKemenbiroID(ctx, req.KemenbiroID); err != nil {
+			return err
+		}
+	}
+
+	if err := s.r.UpdateProgramKerja(ctx, req); err != nil {
+		if err.Error() == "no fields to update" {
+			return response.ErrNoFieldsToUpdate
+		}
+		if err.Error() == "no rows affected" {
+			return response.ErrNotFound
+		}
+
+		log.GetLogger().WithFields(map[string]interface{}{
+			"error":   err,
+			"request": req,
+		}).Errorln("[ProgramKerjaService][UpdateProgramKerja] fail to update program kerja")
+		return response.ErrInternalServerError
+	}
+
+	return nil
+}

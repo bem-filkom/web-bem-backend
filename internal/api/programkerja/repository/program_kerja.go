@@ -3,8 +3,12 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 	"github.com/bem-filkom/web-bem-backend/internal/api/programkerja"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/entity"
+	"github.com/bem-filkom/web-bem-backend/internal/pkg/log"
+	"github.com/bem-filkom/web-bem-backend/internal/pkg/sqlutil"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -24,15 +28,15 @@ func createProgramKerja(ctx context.Context, tx sqlx.ExtContext, programKerja *e
 	return id, nil
 }
 
-func (r *programKerjaRepository) createPenanggungJawab(ctx context.Context, tx sqlx.PreparerContext, programKerja *entity.ProgramKerja) error {
+func (r *programKerjaRepository) createPenanggungJawabs(ctx context.Context, tx sqlx.PreparerContext, pjs []*entity.BemMember, prokerID uuid.UUID) error {
 	stmt, err := tx.PrepareContext(ctx, createPenanggungJawabQuery)
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 
-	for _, pj := range programKerja.PenanggungJawabs {
-		if _, err := stmt.ExecContext(ctx, pj.NIM, programKerja.ID); err != nil {
+	for _, pj := range pjs {
+		if _, err := stmt.ExecContext(ctx, pj.NIM, prokerID); err != nil {
 			return err
 		}
 	}
@@ -54,7 +58,7 @@ func (r *programKerjaRepository) CreateProgramKerja(ctx context.Context, program
 
 	programKerja.ID = prokerID
 
-	if err := r.createPenanggungJawab(ctx, tx, programKerja); err != nil {
+	if err := r.createPenanggungJawabs(ctx, tx, programKerja.PenanggungJawabs, programKerja.ID); err != nil {
 		return uuid.Nil, err
 	}
 
@@ -103,4 +107,83 @@ func (r *programKerjaRepository) getKemenbiroIDByProgramKerjaID(ctx context.Cont
 
 func (r *programKerjaRepository) GetKemenbiroIDByProgramKerjaID(ctx context.Context, prokerID uuid.UUID) (uuid.UUID, error) {
 	return r.getKemenbiroIDByProgramKerjaID(ctx, r.db, prokerID)
+}
+
+func (r *programKerjaRepository) updatePenanggungJawabs(ctx context.Context, tx sqlx.PreparerContext, updates *programkerja.UpdateProgramKerjaRequest) error {
+	if err := r.deletePenanggungJawabs(ctx, tx, updates.ID); err != nil {
+		return err
+	}
+
+	if err := r.createPenanggungJawabs(ctx, tx, updates.PenanggungJawabs, updates.ID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *programKerjaRepository) updateProgramKerja(ctx context.Context, tx *sqlx.Tx, updates *programkerja.UpdateProgramKerjaRequest) error {
+	queryPart, args, argIndex, err := sqlutil.GenerateUpdateQueryPart(updates)
+	if err != nil {
+		log.GetLogger().WithFields(map[string]interface{}{
+			"error":   err,
+			"updates": updates,
+		}).Errorln("[ProgramKerjaRepository][updateProgramKerja] fail to generate update query parts")
+	}
+
+	if len(queryPart) == 0 && updates.PenanggungJawabs == nil {
+		return errors.New("no fields to update")
+	}
+
+	if updates.PenanggungJawabs != nil {
+		if err := r.updatePenanggungJawabs(ctx, tx, updates); err != nil {
+			return err
+		}
+	}
+
+	updateQuery := fmt.Sprintf(updateProgramKerjaQuery, queryPart, argIndex)
+	args = append(args, updates.ID)
+
+	result, err := tx.ExecContext(ctx, updateQuery, args...)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return errors.New("no rows affected")
+	}
+
+	return nil
+}
+
+func (r *programKerjaRepository) UpdateProgramKerja(ctx context.Context, updates *programkerja.UpdateProgramKerjaRequest) error {
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	if err := r.updateProgramKerja(ctx, tx, updates); err != nil {
+		return err
+	}
+
+	return tx.Commit()
+}
+
+func (r *programKerjaRepository) deletePenanggungJawabs(ctx context.Context, tx sqlx.PreparerContext, id uuid.UUID) error {
+	stmt, err := tx.PrepareContext(ctx, deletePenanggungJawabsQuery)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	if _, err := stmt.ExecContext(ctx, id); err != nil {
+		return err
+	}
+
+	return nil
 }

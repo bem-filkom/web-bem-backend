@@ -17,6 +17,7 @@ type IProgramKerjaService interface {
 	GetProgramKerjaByID(ctx context.Context, req *programkerja.GetProgramKerjaByIDRequest) (*entity.ProgramKerja, error)
 	GetProgramKerjasByKemenbiroID(ctx context.Context, req *programkerja.GetProgramKerjasByKemenbiroIDRequest) ([]*entity.ProgramKerja, error)
 	GetKemenbiroIDByProgramKerjaID(ctx context.Context, prokerID uuid.UUID) (uuid.UUID, error)
+	UpdateProgramKerja(ctx context.Context, req *programkerja.UpdateProgramKerjaRequest) error
 }
 
 func NewProgramKerjaService(r repository.IProgramKerjaRepository) IProgramKerjaService {

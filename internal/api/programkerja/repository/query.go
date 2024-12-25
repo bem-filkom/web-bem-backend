@@ -64,4 +64,12 @@ var (
 	getKemenbiroIDByProgramKerjaIDQuery = `
 		SELECT kemenbiro_id FROM program_kerjas WHERE id = $1
 	`
+
+	deletePenanggungJawabsQuery = `
+		DELETE FROM program_kerja_penanggung_jawabs WHERE program_kerja_id = $1
+	`
+
+	updateProgramKerjaQuery = `
+		UPDATE program_kerjas SET %s WHERE id=$%d
+	`
 )

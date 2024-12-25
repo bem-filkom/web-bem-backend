@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"github.com/bem-filkom/web-bem-backend/internal/api/programkerja"
 	"github.com/bem-filkom/web-bem-backend/internal/pkg/entity"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -16,6 +17,7 @@ type IProgramKerjaRepository interface {
 	GetProgramKerjaByID(ctx context.Context, id uuid.UUID) (*entity.ProgramKerja, error)
 	GetProgramKerjasByKemenbiroID(ctx context.Context, kemenbiroID uuid.UUID) ([]*entity.ProgramKerja, error)
 	GetKemenbiroIDByProgramKerjaID(ctx context.Context, prokerID uuid.UUID) (uuid.UUID, error)
+	UpdateProgramKerja(ctx context.Context, updates *programkerja.UpdateProgramKerjaRequest) error
 }
 
 func NewProgramKerjaRepository(db *sqlx.DB) IProgramKerjaRepository {

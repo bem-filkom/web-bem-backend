@@ -59,3 +59,23 @@ func (h *ProgramKerjaHandler) GetProgramKerjasByKemenbiroID() fiber.Handler {
 		})
 	}
 }
+
+func (h *ProgramKerjaHandler) UpdateProgramKerja() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var req programkerja.UpdateProgramKerjaRequest
+
+		if err := c.ParamsParser(&req); err != nil {
+			return response.ErrUnprocessableEntity
+		}
+
+		if err := c.BodyParser(&req); err != nil {
+			return response.ErrUnprocessableEntity
+		}
+
+		if err := h.s.UpdateProgramKerja(c.Context(), &req); err != nil {
+			return err
+		}
+
+		return c.SendStatus(fiber.StatusNoContent)
+	}
+}
