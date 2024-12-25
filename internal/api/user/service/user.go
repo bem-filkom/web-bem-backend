@@ -206,7 +206,7 @@ func (s *userService) UpdateBemMember(ctx context.Context, req *user.UpdateBemMe
 		Period:      req.Period,
 	}); err != nil {
 		if err.Error() == "no fields to update" {
-			return response.ErrNoUpdatedField
+			return response.ErrNoFieldsToUpdate
 		}
 
 		log.GetLogger().WithFields(map[string]any{

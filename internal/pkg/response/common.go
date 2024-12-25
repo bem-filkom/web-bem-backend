@@ -23,8 +23,8 @@ var (
 			WithRefCode("NOT_FOUND").
 			WithMessage("Data yang kamu cari tidak ditemukan.")
 
-	ErrNoUpdatedField = NewError(http.StatusBadRequest).
-				WithRefCode("NO_UPDATED_FIELD").
+	ErrNoFieldsToUpdate = NewError(http.StatusBadRequest).
+				WithRefCode("NO_FIELDS_TO_UPDATE").
 				WithMessage("Tidak ada data yang diperbarui.")
 
 	ErrForbiddenRole = NewError(http.StatusForbidden).

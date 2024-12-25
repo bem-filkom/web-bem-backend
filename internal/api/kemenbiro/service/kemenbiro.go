@@ -131,7 +131,7 @@ func (s *kemenbiroService) UpdateKemenbiro(ctx context.Context, req *kemenbiro.U
 
 	if err := s.r.UpdateKemenbiro(ctx, updates); err != nil {
 		if err.Error() == "no fields to update" {
-			return response.ErrNoUpdatedField
+			return response.ErrNoFieldsToUpdate
 		}
 
 		if err.Error() == "no rows affected" {
